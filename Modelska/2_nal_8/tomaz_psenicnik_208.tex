@@ -1,0 +1,520 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene]{babel}    % naloži, med drugim, slovenske delilne vzorce
+
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{amsmath}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}} %naredi vector kot bold zapis
+
+\usepackage{float}
+
+\usepackage{amssymb}
+
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[slovene]{babel}
+%\usepackage[latin2]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{makeidx}%za stvarno kazalo
+%\makeindex%naredi stvarno kazalo
+%\usepackage{tikz}% paket za kroge
+
+\title{\textbf{Modelska analiza 2} \\ 8. naloga - Metoda končnih elementov: Lastne rešitve \\}
+	\author{Študent: Pšeničnik Tomaž}
+	
+	
+
+
+	
+\begin{document}
+
+\pagenumbering{gobble}
+
+	\begin{figure} [h]
+  \centering
+  \includegraphics[width=12 cm]{logo_fmf.png}
+  \maketitle
+\end{figure}
+	
+	
+	
+	\newpage
+	\pagenumbering{arabic}
+	
+	
+	
+\section*{Lastne rešitve FEM - Teorija}
+
+Z metodo končnih elementov (FEM) želimo poračunati lastne nihajne načine polkrožne opne. Problem je zelo podoben reševanju \textit{Poissonove} enačbe v prejšnji nalogi, le da tokrat rešujemo s pomočjo lastnih vrednosti. Enačba se tokrat glasi 
+\begin{equation} \label{eq:enacba1}
+\nabla ^{2} u =-k^{2} u,
+\end{equation}
+kjer je $k$ lastna vrednost sistema.
+
+Podobno kot dobimo \textit{Poissonovo} enačbo z zahtevo po ekstremu funcionala $\mathcal{S}(u) = \frac{1}{2} \left\langle \nabla u , \nabla u \right\rangle - \left\langle f,u \right\rangle$, dobimo tudi enačbo (\ref{eq:enacba1}) z zahtevo po ekstremu funkcionala
+\begin{equation} \label{eq:enacba2}
+\mathcal{S}(u) = \frac{1}{2} \left\langle \nabla u , \nabla u \right\rangle - \frac{1}{2} k^{2}\left\langle u,u \right\rangle,
+\end{equation}
+kjer je skalarni produkt definiran  na $L^{2}$ prostoru kot
+\begin{align*}
+\left\langle a ,b \right\rangle= \int a \cdot b  \ \ dxdy.
+\end{align*}
+Če zapišemo funkcional (\ref{eq:enacba2}) kot $\mathcal{S}(u)=\int \mathcal{L}(\nabla u,u) dx dy$, dobimo z \textit{Euler-Lagrangevo} enačbo:
+\begin{align*}
+\sum _i \frac{\partial}{ \partial x_i} \frac{ \partial \mathcal{L}}{ \partial u_{x{_i}}} - \frac{ \partial \mathcal{L}}{\partial u}=0
+\end{align*}
+ravno enačbo (\ref{eq:enacba1}). Toda naš cilj ni reševanje E-L enačb, temveč varrirati funckional (\ref{eq:enacba2}) po baznih funkcijah, kar je enako iskanju ekstrema funkcionala. 
+
+Kot v prejšnji nalogi, tudi tokrat razvijemo iskano funkcijo $u$ po baznih funkcijah
+\begin{align*}
+u=\sum_{i=1} ^{N} c_i \phi _i 
+\end{align*}
+in vstavimo v funkcional (\ref{eq:enacba2}). Dobimo
+\begin{equation} \label{eq:enacba3}
+\mathcal{S}=\frac{1}{2} \sum _{ij} \left\langle  c_i \phi _i , c_j \phi_j   \right\rangle - \frac{1}{2} k^{2} \sum _{ij} \left\langle  c_i \phi _i , c_j \phi_j   \right\rangle.
+\end{equation}
+Kot omenjeno, iščemo ekstrem funkcionala (\ref{eq:enacba3}) po baznih funkcijah, kar prepoznamo kot sistem linearnih enačb, ki ga zapišemo:
+\begin{equation}
+\frac{ \partial \mathcal{S}}{\partial c_i}= 0 \rightarrow \sum _{ij} (A_{ij} - k^{2} B_{ij})c_j = 0  \qquad  \forall i.
+\end{equation}
+Za bazne funkcije bomo vzeli iste funkcije kot v prejšnji nalogi.
+Izračun lokalne matrike $A^{k}_{ij}$ tako poznamo že od prejšnje naloge in je enak:
+\begin{equation*}
+A^{k}_{ij}=\left\langle   \nabla \phi _i , \nabla \phi_j   \right\rangle =\frac{1}{2|J_k|} (y_{i+1} - y_{i+2} , \ \ x_{i+2} - x_{i+1})
+\begin{pmatrix}
+ y_{j+1} - y_{j+2} \\ x_{j+1} - x_{j+1}
+\end{pmatrix}.
+\end{equation*}
+Za lokalno $B^{k}_{ij}$ matriko pa velja
+\begin{equation*}
+\left\langle  \phi _i , \phi_j   \right\rangle = \int _{\bigtriangleup_{k}} \phi _i \phi _j dx dy =\int _{\bigtriangleup ^{*}} \chi _i \chi _j |J_k| d\xi d\eta,
+\end{equation*}
+kjer je $\phi_i$ bazna funkcija trikotnika $\bigtriangleup _{k}$ podanega območja in $\chi_i$ bazna funkcija referenčnega trikotnika $\bigtriangleup_{*}$, $|J_k|=2\bigtriangleup_{k}$ pa Jacobijeva determinanta, ki je konstantna in enaka dvakratni ploščini $\bigtriangleup_{k}$. Tako dobimo za integral po baznih funkcijah referenčnega trikotnika
+\begin{equation*}
+B_{ii} ^{k}= \int _{\bigtriangleup _{*}} \chi _i \chi _i |J_k|d\xi d\eta = \frac{|J_k|}{12} \qquad \textrm{in} \qquad B_{i\neq j}^{k} =  \int _{\bigtriangleup _{*}} \chi _i \chi _j |J_k|d\xi d\eta = \frac{|J_k|}{24}
+\end{equation*}
+oziroma, za območje $\bigtriangleup_{k}$
+\begin{equation}
+B_{ii}^{k} = \frac{1}{6} \bigtriangleup_{k} \qquad \textrm{in} \qquad B_{i\neq j}^{k}=\frac{1}{12} \bigtriangleup_{k}.
+\end{equation}
+Potrebno je sestaviti globalni matriki $A$ in $B$ ter tako poračunati sistem 
+\begin{align*}
+A \vec{c}= k^{2} B \vec{c},
+\end{align*}
+kjer je rešitev
+\begin{align*}
+u(x,y)=\sum_i c_i \phi_i.
+\end{align*}
+
+\section*{Lastni nihajni načini kvadratne opne}
+
+Kljub temu, da je naša naloga poiskati lastne nihanje načine opne, si bomo za začetek pogledali lastne nihajne načine kvadratne opne. Na slikah (\ref{fig:slika1}) sta prikazani matriki $A$ in $B$, kjer upoštevamo le notranje elemente triangulacije, prikazane na sliki \ref{fig:slika2}. Matrika $A$ je identična matriki diskretnih diferencialov, ki smo jo srečali v 5. in 6. nalogi. To je slučaj zaradi izbire porazdelitve točk. Obliko matrike $B$ vidimo prvič. Obe matriki sta redki (\textit{sparse}) in simetrični, zato lahko za iskanje lastnih vrednosti uporabimo knjižico \texttt{scipy.sparse.linalg.eigsh}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat_A.pdf}
+        \caption{Globalna matrika $A$.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat_B.pdf}
+        \caption{Globalna matrika $B$.}
+    \end{subfigure}
+    \caption{Globalni matriki za kvadratno opno.} \label{fig:slika1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat_tri.pdf}
+    \end{subfigure}
+    \caption{Triangulacija za kvadratno opno za 10x10 točk.} \label{fig:slika2}
+\end{figure}
+
+\noindent Lastne nihajne načine smo poiskali za 50x50 točk. Lastne vrednosti za prve štiri lastne nihajne načine so prikazane v tabeli \ref{table:tabela1}. Na slikah \ref{fig:slika3} so nato prikazani lastni nihajni načini pridobleni s FEM metodo v jeziku \textit{Python}.
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|} 
+\hline
+n & i j                                               & $\pi ^{2} (i^{2} + j^{2})$ & $k^{2}$                                                   \\ \hline
+1 & 1 1                                               & 19.7392                    & 19.7584                                                   \\ \hline
+2 & \begin{tabular}[c]{@{}l@{}}1 2\\ 2 1\end{tabular} & 49.3480                    & \begin{tabular}[c]{@{}l@{}}49.4512\\ 49.4516\end{tabular} \\ \hline
+3 & 2 2                                               & 78.9568                    & 79.2920                                                   \\ \hline
+4 & \begin{tabular}[c]{@{}l@{}}3 2\\ 2 3\end{tabular} & 98.6960                    & \begin{tabular}[c]{@{}l@{}}99.0636\\ 99.0680\end{tabular} \\ \hline
+\end{tabular}
+\caption{Lastne vrednosti za prve štiri lastne nihajne načine.}
+\label{table:tabela1}
+\end{center}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat__lastne_1.pdf}
+        \caption{Prvi nihajni način.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat__lastne_4.pdf}
+        \caption{Tretji nihajni način.}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat__lastne_2.pdf}
+        \caption{Drugi nihajni način.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat__lastne_3.pdf}
+        \caption{Drugi nihajni način.}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat__lastne_5.pdf}
+        \caption{Četrti nihajni način.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat__lastne_6.pdf}
+        \caption{Četrti nihajni način.}
+    \end{subfigure}
+    \caption{Lastni nihajni načini kvadratne opne izračunani v jeziku \textit{Python}.} \label{fig:slika3}
+\end{figure}
+
+\noindent Poračunali pa smo še lastne nihajne načine s pomočjo programa \textit{Matlab}, kateri ima vgrajeno orodje za reševanje parcialnih diferencialnih enačb. Prikličemo ga z ukazom \texttt{pdetool}. Rešitve so prikazane na slikah \ref{fig:slika4}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat_lastna1.png}
+        \caption{Prvi nihajni način.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat_lastna4.png}
+        \caption{Tretji nihajni način.}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat_lastna2.png}
+        \caption{Drugi nihajni način.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat_lastna3.png}
+        \caption{Drugi nihajni način.}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat_lastna5.png}
+        \caption{Četrti nihajni način.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat_lastna6.png}
+        \caption{Četrti nihajni način.}
+    \end{subfigure}
+    \caption{Lastni nihajni načini kvadratne opne izračunani v programu\textit{Matlab}.} \label{fig:slika4}
+\end{figure}
+
+
+
+
+\section*{Lastni nihajni načini polkrožne opne}
+
+Reševanje je identično kot za primer kvadratne opne, le da imamo tokrat drugačno triangulacijo območja. Triangulacija je prikazana na sliki \ref{fig:slika5}, kjer imamo 406 notranjih točk in 91 robnih točk.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_tri.pdf}
+    \end{subfigure}
+    \caption{Triangulacija za polkrožno opno za 497 točk.} \label{fig:slika5}
+\end{figure}
+
+\noindent Ponovno si oglejmo globalni matriki $A$ in $B$, prikazani na slikah \ref{fig:slika6}. Matriki sta še vedno simetrični in redki (\textit{sparse}), kar ni presenetljivo. Vidimo tudi, da zaradi drugačne porazdelitve točk ne dobimo več matrike $A$ z elementi 4 in -1, temveč se razlikujejo. Izvendiagonalni elementi se širijo narazen. Vzrok tiči v izbiri točk za triangulacijo, namreč na vsakem polkrogu od $r=0$ do $r=R$ imamo več točk, zato pride tudi do razširanjanja izvendiagonalnih elementov. Za izračun lastnih nihajnih načinov ponovno uporabimo knjižico \texttt{scipy.sparse.linalg.eigsh}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_A.pdf}
+        \caption{Globalna matrika $A$.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_B.pdf}
+        \caption{Globalna matrika $B$.}
+    \end{subfigure}
+    \caption{Globalni matriki za polkrožno opno.} \label{fig:slika6}
+\end{figure}
+
+\noindent Lastne nihajne načine smo poiskali za 406 notranjih točk. Lastne vrednosti za prvih šest lastnih nihajnih načinov polkrožne opne, so prikazane v tabeli \ref{table:tabela2}. Na slikah \ref{fig:slika7} so nato prikazani lastni nihajni načini pridobleni s FEM metodo v jeziku \textit{Python}.
+
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_lastne_1.pdf}
+        \caption{Prvi nihajni način $i=1$, $j=1$.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_lastne_2.pdf}
+        \caption{Drugi nihajni način $i=2$, $j=1$.}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_lastne_3.pdf}
+        \caption{Tretji nihajni način $i=3$, $j=1$.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_lastne_4.pdf}
+        \caption{Četrti nihajni način $i=1$, $j=2$.}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_lastne_5.pdf}
+        \caption{Peti nihajni način $i=4$, $j=1$.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_lastne_6.pdf}
+        \caption{Šesti nihajni način $i=2$, $j=2$.}
+    \end{subfigure}
+    \caption{Lastni nihajni načini polkrožne opne izračunani v jeziku \textit{Python}.} \label{fig:slika7}
+\end{figure}
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+n & i j & $\xi ^{j} _i /0.5$ & $k^{2}$  & $\xi ^{j} _i$ \\ \hline
+1 & 1 1 & 58,7278                    & 59,0190  & 3,8317        \\ \hline
+2 & 2 1 & 105,4985                   & 106,3977 & 5,1356        \\ \hline
+3 & 3 1 & 162,8259                   & 164,8956 & 6,3802        \\ \hline
+4 & 1 2 & 196,8738                   & 200,3545 & 7,0156        \\ \hline
+5 & 4 1 & 230,3318                   & 234,6404 & 7,5883        \\ \hline
+6 & 2 2 & 283,4000                   & 290,4187 & 8,4172        \\ \hline
+\end{tabular}
+\caption{Lastne vrednosti za prvih 6 lastnih nihajnih načinov polkrožne opne dobljenih v jeziku \textit{Python}.}
+\label{table:tabela2}
+\end{center}
+\end{table}
+
+
+
+\section*{Lastni nihajni načini danega lika}
+
+Iskanje lastnih nihajnih načinov je mnogo lažje v orodju \textit{Matlab} v katerem hitreje podamo območje iskanja, triangulacijo pa izvede program sam. Tako smo dobili rezultate, prikazane na slikah \ref{fig:slika8} in \ref{fig:slika9}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}  			
+        \includegraphics[width=\textwidth]{lik_lastna1.png}
+        \caption{Prvi nihajni način}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.4\textwidth}  			
+        \includegraphics[width=\textwidth]{lik_lastna2.png}
+        \caption{Drugi nihajni način}
+    \end{subfigure}
+    
+        \begin{subfigure}[b]{0.4\textwidth}  			
+        \includegraphics[width=\textwidth]{lik_lastna3.png}
+        \caption{Tretji nihajni način}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.4\textwidth}  			
+        \includegraphics[width=\textwidth]{lik_lastna4.png}
+        \caption{Četrti nihajni način}
+    \end{subfigure}
+    \caption{Prvi štirje lastni nihajni načini danega lika} \label{fig:slika8}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}  			
+        \includegraphics[width=\textwidth]{lik_lastna5.png}
+        \caption{Peti nihajni način}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.4\textwidth}  			
+        \includegraphics[width=\textwidth]{lik_lastna6.png}
+        \caption{Šesti nihajni način}
+    \end{subfigure}
+    
+        \begin{subfigure}[b]{0.4\textwidth}  			
+        \includegraphics[width=\textwidth]{lik_lastna7.png}
+        \caption{Sedmi nihajni način}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.4\textwidth}  			
+        \includegraphics[width=\textwidth]{lik_lastna8.png}
+        \caption{Osmi nihajni način}
+    \end{subfigure}
+    \caption{Peti, šesti, sedmi in osmi lastni nihajni načini danega lika.} \label{fig:slika9}
+\end{figure}
+
+\section*{Nastavek Galerkinova}
+
+Poskusimo oceniti lastne nihajne vrednosti za polkrožno opno z \textit{Galerkinovim} nastavkom
+\begin{equation} \label{eq:enacba6}
+\phi_i \rightarrow \phi _{mn}(r,\varphi) = r^{m+n} (1-r) \sin(m \varphi),
+\end{equation}
+ki je bazna funkcija napeta čez celoten naš polkrog, pri čemer je
+\begin{equation*}
+1 \leq m \leq m_{max} \qquad  \textrm{in} \qquad 0 \leq n \leq n_{max}.
+\end{equation*}
+Za začetek si poglejmo nekaj baznih funkcij, prikazanih na slikah \ref{fig:slika10}. Določene bazne funkcije spominjajo na lastne nihajne načine. Ideja je tako iz nekaj izbranih baznih funckij skonstruirati lastne nihajne načine in poiskati lastne vrednosti. Skonstruirati je potrebno matriko $A$ in matriko $B$ ter rešiti sistem
+\begin{equation*}
+A \vec{c} = k^{2} B \vec{c}.
+\end{equation*}
+Tako dobimo rešitev
+\begin{align*}
+u(x,y)= \sum _i c_i \phi _i.
+\end{align*}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_baznefun_10.pdf}
+        \caption{$m=1$, $n=0$.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_baznefun_11.pdf}
+        \caption{$m=1$, $n=1$.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_baznefun_12.pdf}
+        \caption{$m=1$, $n=2$.}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_baznefun_20.pdf}
+        \caption{$m=2$, $n=0$.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_baznefun_21.pdf}
+        \caption{$m=2$, $n=1$.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_baznefun_22.pdf}
+        \caption{$m=2$, $n=2$.}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_baznefun_30.pdf}
+        \caption{$m=3$, $n=0$.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_baznefun_31.pdf}
+        \caption{$m=3$, $n=1$.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_baznefun_32.pdf}
+        \caption{$m=3$, $n=2$.}
+    \end{subfigure}
+    \caption{Nekaj prvih baznih funckij.} \label{fig:slika10}
+\end{figure}
+
+Konstrukcija matrik je zelo podobna prejšnji metodi FEM:
+\begin{align*}
+A_{ij} \rightarrow A_{(mn)(kl)}= \left\langle \nabla \phi_{mn} , \nabla \phi_{kl} \right\rangle \\
+B_{ij} \rightarrow B_{(mn)(kl)}= \left\langle  \phi_{mn} ,  \phi_{kl} \right\rangle,
+\end{align*}
+tako dobimo bločni matriki. Tokrat moramo je skalarni produkt $\left\langle  a ,  b \right\rangle$ definiran drugače, in sicer:
+\begin{align*}
+\left\langle  a ,  b \right\rangle = \int _0 ^{1} r dr \int_0 ^{\pi} a \cdot b \ \ d \varphi .
+\end{align*}
+Funkcije $\sin (m \varphi)$ so med seboj ortogonalne in nam olajšajo delo, saj je potrebno poračunati le diagonalne elemente bločnih matrik. Matriki $A$ in $B$ sta torej enaki:
+\begin{align}
+A_{(mn),(ml)} & =\left\langle \nabla \phi_{mn} , \nabla \phi_{ml} \right\rangle \nonumber \\ & = \frac{\pi}{2} \left( \frac{nl}{2m +n +l} - \frac{2nl + n +l}{2m +n +l +1} + \frac{(n+1)(l+1)}{2m +n +l+2}\right),
+\end{align}
+\begin{align}
+ B_{(mn),(ml)} & =\left\langle \phi_{mn} , \phi_{ml} \right\rangle \nonumber \\ & = \frac{\pi}{2} \left( \frac{1}{2m +n +l +2} - \frac{2}{2m +n +l +3} + \frac{1}{2m +n +l+4}\right).
+\end{align}
+Če si pogledamo izračunani matriki na sliki \ref{fig:slika11}, opazimo, da sta simetrični. Zato lahko za pridobitev lastnih vrednosti in vektorjev uporabimo knjižico \texttt{scipy.linalg.eigh}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_lastne_A.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.35\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_lastne_B.pdf}
+    \end{subfigure}
+    \caption{Matrika $A$ levo in matrika $B$ desno za $m=3$ in $n=4$.} \label{fig:slika11}
+\end{figure}
+
+\noindent Poračunali smo lastne vrednosti za prvih 13 lastnih vrednosti. Primerjava z analitičnimi je prikazana v tabeli \ref{table:tabela3}.
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+n & i j & $(\xi ^{j}_i)^{2}$ & $k^{2}$  & $\xi ^{j} _i$ \\ \hline
+1 & 1 1 & 14,6819                    & 14,6820  & 3,8317        \\ \hline
+2 & 2 1 & 26,3746                   & 26,3746 & 5,1356        \\ \hline
+3 & 3 1 &   40,7065                 & 40,7065 & 6,3802        \\ \hline
+4 & 1 2 & 49,2185                   & 49,2185 & 7,0156        \\ \hline
+5 & 4 1 & 57,5829                  & 57,5829 & 7,5883        \\ \hline
+6 & 2 2 & 70,8500                   & 70,8500 & 8,4172        \\ \hline
+7 & 1 5 &  76,9389                  & 76,9389 & 8,7715        \\ \hline
+8 & 3 2 & 95,2776                  & 95,2776 & 9,7610       \\ \hline
+9 & 6 1 & 98,7263                   & 98,7263 & 9,9361        \\ \hline
+10 & 1 3 & 103,4995                   & 103,5073 & 10,1735        \\ \hline
+11 & 4 2 & 122,4278                  & 122,4279 & 11,0647        \\ \hline
+12 & 7 1 & 122,9076                   & 122,9076 & 11,0864        \\ \hline
+13 & 2 3 & 135,0207                  & 135,0545 & 11,6198         \\ \hline
+14 & 8 1 & 149,4529                   & 149,4529 & 12,2251        \\ \hline
+15 & 5 2 & 152,2412                  & 152,2414 & 12,3386        \\ \hline
+\end{tabular}
+\caption{Nekaj lastnih vrednosti za $m=10$ in $n=7$.}
+\label{table:tabela3}
+\end{center}
+\end{table}
+
+\noindent Poračunane lastne vrednosti se izjemno ujemajo z analitičnimi. Rezultat je veliko boljši kot pri metodi s trikotniki, tudi izračun lastnih vrednosti in lastnih vektorjev je časovno zelo kratek. Pokazali smo, da lahko z ustreznimi baznimi funkcijami precej hitreje in veliko natančneje dobimo rezultate.
+
+Lastne nihajne načine lahko skonstruiramo iz dobljenih lastnih vektorjev. Poglejmo si le nekaj višjih lastnih nihajnih načinov, prikazanih na slikah \ref{fig:slika12}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_lastne_6.pdf}
+        \caption{7 nihajni način.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_lastne_7.pdf}
+        \caption{8 nihajni način.}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_lastne_8.pdf}
+        \caption{9 nihajni način.}
+    \end{subfigure}
+    
+        \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_lastne_9.pdf}
+        \caption{10 nihajni način.}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_lastne_10.pdf}
+        \caption{11 nihajni način.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_lastne_11.pdf}
+        \caption{12 nihajni način.}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_lastne_12.pdf}
+        \caption{13 nihajni način.}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_lastne_13.pdf}
+        \caption{14 nihajni način.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.3\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_galerkin_lastne_14.pdf}
+        \caption{15 nihajni način.}
+    \end{subfigure}
+    \caption{Nekaj lastnih nihajnih načinov.} \label{fig:slika12}
+\end{figure}
+
+\end{document}
