@@ -1,0 +1,409 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene]{babel}    % naloži, med drugim, slovenske delilne vzorce
+
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{amsmath}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}} %naredi vector kot bold zapis
+
+\usepackage{float}
+
+\usepackage{amssymb}
+
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[slovene]{babel}
+%\usepackage[latin2]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{makeidx}%za stvarno kazalo
+%\makeindex%naredi stvarno kazalo
+%\usepackage{tikz}% paket za kroge
+
+\title{\textbf{Modelska analiza 2} \\ 9. naloga - Metoda robnih elementov \\}
+	\author{Študent: Pšeničnik Tomaž}
+	
+	
+
+
+	
+\begin{document}
+
+\pagenumbering{gobble}
+
+	\begin{figure} [h]
+  \centering
+  \includegraphics[width=12 cm]{logo_fmf.png}
+  \maketitle
+\end{figure}
+	
+	
+	
+	\newpage
+	\pagenumbering{arabic}
+	
+	
+
+\section*{Elektrostatsko polje nabitega traku }
+
+Želimo najti elektrostatični potencial nabitega neskončno dolgega traku. S tem smo problem prevedli na 2D. Potencial takšnega traku širine $l$ nabitega z enotsko gostoto naboja, postavljenega v izhodišče koordinatnega sistema, opišemo z \textit{Greenovo} funkcijo $G_{0,r}=u(x,y)$:
+\begin{align} \label{eq:enacba1}
+u(x,y)&=\frac{1}{4 \pi} \int _{-l/2} ^{l/2} \log((x -\xi)^{2} + y^{2}) d\xi  \\&= \frac{1}{2\pi} \left( -y \arctan\left( \frac{x - l/2}{y} \right)  +y \arctan\left( \frac{x + l/2}{y} \right) -l \right) \nonumber \\
+ &+ \frac{1}{4 \pi} \left(  (x+l/2) \log (y^{2} + (x+l/2)^{2})  - (x-l/2) \log (y^{2} + (x-l/2)^{2}) \right). \nonumber
+\end{align}
+Trak širine $l$ in potencialno polje v točki $u(x,y)$ v lastnem sistemu je prikazan na sliki  \ref{fig:slika1}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidth}  			
+        \includegraphics[width=\textwidth]{G_0_r.pdf}
+    \end{subfigure}
+    \caption{Greenova funkcija  panela v lastnem sistemu $G_0(0,x ,y)$.} \label{fig:slika1}
+\end{figure}
+
+\noindent Ideja tokratne naloge je, opisati neko poljubno obliko s končno mnogimi trakovi dolžin $l_i$ oz. tako imenovanimi ‘‘paneli’’. Pri tem je potrebno panele ustrezno prestaviti in rotirati, kot prikazano na sliki \ref{fig:slika2}. Potencial laboratorijskega sistema je tako potrebno poračunati v ustreznem lastnem sistemu panela.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{\textwidth}  			
+        \includegraphics[width=\textwidth]{G.pdf}
+    \end{subfigure}
+    \caption{Prestavljen in rotiran panel in njegov lastni sistem. Dobimo $G_{r,r'}$.} \label{fig:slika2}
+\end{figure}
+
+Za začetek si poglejmo potencialno polje enakomerno nabitega panela prikazao na sliki \ref{fig:slika3}, ki predstavlja izolator, kateri ima nanešeno konstantno gostoto naboja.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}  			
+        \includegraphics[width=\textwidth]{ravna_zica.pdf}
+    \end{subfigure}
+    \caption{Izolator s konstantno gostoto naboja.} \label{fig:slika3}
+\end{figure}
+
+\noindent Rezultat je seveda pričakovan. Potrebno je opomniti, da rezultat je le približek zelo dolgega traku in nima fizikalnega pomena, saj potencial, za katerega \textit{Greenova} funkciaj za ravnino $u(r)= \frac{1}{2\pi}\log(r)$ divergira, ko $u(r \rightarrow \infty)  \rightarrow 
+\infty$, kar seveda fizikalno nima iterpretacije.
+
+Poglejmo si sedaj polje prevodnega traku. Trak razdelimo na panele. Želimo imeti konstanten potencial na traku. To dosežemo tako, da  poračunamo prispevek $j$-tega panela v središču $i$-tega, kar je element $G_{ij}$ matrike $G$. Takšna matrika je simetrična. Želimo, da velja
+\begin{equation}
+u_i = \sum_j G_{ij} \sigma _j = konst. \ \,
+\end{equation}
+kjer je $u_i$ potencial $i$-tega panela in ga postavimo na konstantno vrednost. Torej iščemo površinske gostote naboja $\sigma _i$ panelov. Z izračunano matriko $G$ je iskanje vektorja $\sigma$ trivialno. Z izračunanimi gostotami naboja $\sigma$ je potem naša rešitev v poljubni točki laboratorijskega sistema kar
+\begin{equation*}
+u(x,y)= \sum _i G_{ij} \sigma _i,
+\end{equation*}
+seveda v smislu, da so paneli ustrezno rotirani in translatirani.
+Na sliki \ref{fig:slika4} je prikazan rezultat elektrostatskega polja za raven prevoden trak, razdeljen na 100 panelov. Robne točke panelov smo določili s funkcijo
+\begin{equation*}
+f=0.5 \cos (\pi x),
+\end{equation*}
+kjer je $x$ enakomerno porazdeljen med 0 in 1. Tako dobimo bolj gosto razporeditev točk na robovih traku.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}  			
+        \includegraphics[width=\textwidth]{ravna_zica_3.pdf}
+    \end{subfigure}
+    \caption{Potencial prevodnega traku razdeljenega na 100 panelov.} \label{fig:slika4}
+\end{figure}
+
+\noindent Poglejmo si še razporeditev naboja po traku. Razporeditev prikazujeta sliki \ref{fig:slika5}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{ravna_zica_4_sigma.pdf}
+        \caption{Razporeditev površinske gostote naboja $\sigma$.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{ravna_zica_4_charge.pdf}
+        \caption{Razporeditev dolžinske gostote naboja na panelu deljeno z dolžino panela $\sigma_i / l_i$.}
+    \end{subfigure}
+    \caption{Razporeditev naboja po traku, glede na število panelov} \label{fig:slika5}
+\end{figure}
+\noindent Slike \ref{fig:slika5} niso ravno zelo pregledne, vidimo pa, da se naboj nabira na vsakem od vogalov traku in z večanjem števila panelov divergira (je  $\infty$). Celoten naboj mora ostati konstanten. Konvergenco celotnega naboja na širino traku glede na število panelov prikazuje slika \ref{fig:slika6}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}  			
+        \includegraphics[width=\textwidth]{ravna_zica_4_naboj.pdf}
+    \end{subfigure}
+    \caption{$\sum _i \sigma _i  \cdot l_i$} \label{fig:slika6}
+\end{figure}
+
+Podobno analizo bi lahko napravili še za bolj poljubno postavitev elektrod s konstantnim potencialom. Primer je prikazan na sliki \ref{fig:slika7}, kjer imamo enakomerno razporejenih 400 panelov.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{3_paneli_2.pdf}
+        \caption{Elektrostatki potencial.}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{3_paneli_2_sigma.pdf}
+        \caption{Porazdelitev naboja.}
+    \end{subfigure}
+    \caption{Poljubna postavitev treh elektrod s konstantnim potencialom za 200 panelov.} \label{fig:slika7}
+\end{figure}
+
+\noindent Vidimo, da se naboj nabira na vogalih elektrod, kar je seveda pričakovano.
+
+Kot zanimivost si oglejmo še kvazi kondenzator priključen na elektrodi s potencialoma 1 in -1 ter 1  in 1. Podrobne analize ne bomo naredili. Razporeditev naboja je zelo podobna razporeditvi prikazani na sliki \ref{fig:slika5}a. Rezultate prikazujeta sliki \ref{fig:slika8}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kondenzator.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{anti_kondenzator.pdf}
+    \end{subfigure}
+    \caption{Kondenzator in anti-kondenzator :D.} \label{fig:slika8}
+\end{figure}
+
+
+\section*{Obtekanje vitkih teles}
+
+Metoda je zelo popularna v hidrodinamiki za obtekanje idealne tekočine okoli vitkih teles, kjer imamo podan vektor hitrosti v neskončnosti, robni pogoj na površini telesa pa zahteva, da je normalna hitrost enaka 0. Količine $\sigma _i$ predstavljajo gostoto izvirov, ki jih vpeljemo na meji telesa, da z njimi kompenziramo zunanji tok. Enačba (\ref{eq:enacba1}) sedaj predstavlja hitrostni  potencial enega panela v lastnem sistemu. Na enačbo (\ref{eq:enacba1}) delujemo z $\nabla _{x,y}$ in dobimo komponenti hitrosti
+\begin{align}
+  v_{\parallel} &=\frac{1}{4 \pi} \log\left( \frac{(x+l/2)^{2} +y^{2}}{(x-l/2)^{2} +y^{2}} \right) \label{eq:enacba3}\\
+v_ {\perp}&= \frac{1}{2\pi} \left( \arctan\left( \frac{x+l}{y} \right) - \arctan\left( \frac{x-l}{y}\right) \right). \label{eq:enacba4}
+\end{align}
+V dobljenih enačbah je potrebno paziti, saj vzporedna komponenta divergira na vogalih, pravokotna komponenta pa ima v limiti $y \rightarrow 0$ končno vrednost
+\begin{equation*}
+\lim _{y \rightarrow 0} v_{\perp} = \left\{
+        \begin{array}{ll}
+            1/2 & \quad ;-l/2 \leq x \leq l/2 \\
+            0 & \quad ;\textrm{sicer}.
+        \end{array}
+    \right.
+\end{equation*}
+
+Najprej si poglejmo metodo na neskončnem valju, okroglega preseka, kjer bomo za  vektor hitosti v neskončnosti vzeli
+\begin{align*}
+\vec{v}_{\infty}=(\sqrt{2}/2, \sqrt{2}/2).
+\end{align*}
+Najprej razdelimo okrogel presek na panele in izračunamo smerne vektorje $\vec{t}_i$ in normalne 
+vektorje $\vec{n}_i = (-t_{y i}, t_{x i})$ panelov. Nato poračunamo normalne komponente hitrosti, ki jih povzroča tok. Profil in velikost komponent je prikazan na slikah \ref{fig:slika9}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_krog_vprav1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_krog_vprav2.pdf}
+    \end{subfigure}
+    \caption{Profil normalnih komponent hitrosti panelov.} \label{fig:slika9}
+\end{figure}
+\noindent Poračunati moramo matriko $V$ in rešiti sistem $V \sigma =v_{\perp}$. Tokrat imamo opravka z vektorji, zato je potrebno biti previden z rotacijami. Rezultate prikazujeta spodnji sliki \ref{fig:slika10} za primer 99 enakomerno razporejenih panelov.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_krog_U.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_krog_v.pdf}
+    \end{subfigure}
+    \caption{Hitrostno potencialno polje levo in vektorsko hitrostno polje desno.} \label{fig:slika10}
+\end{figure}
+\noindent Prikažemo lahko še razporejenost izračunanih ivzirov gostote. Kot razberemo iz slike \ref{fig:slika11}, so izviri gostote raporejeni ravno obratno, kot profil normalnih hitrosti panelov.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_krog_sigma.pdf}
+    \end{subfigure}
+    \caption{Razporejenost gostote izvirov.} \label{fig:slika11}
+\end{figure}
+
+Poglejmo si sedaj valj s presekom elipse na sto in en način. Prvi primer za vektor hitrosti
+ $\vec{v}_{\infty}=(1, 0)$, rezultate prikazujejo slike \ref{fig:slika12} in \ref{fig:slika13}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_elipsa_0_vprav1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_elipsa_0_vprav2.pdf}
+    \end{subfigure}
+    \caption{Profil normalnih komponent hitrosti panelov za elipso.} \label{fig:slika12}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_elipsa_0_U.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_elipsa_0_v.pdf}
+    \end{subfigure}
+    \caption{Hitrostno potencialno polje levo in vektorsko hitrostno polje desno za elipso.} \label{fig:slika13}
+\end{figure}
+
+\noindent Sledi primer z $\vec{v}_{\infty}=(0, 1)$ na slikah \ref{fig:slika14} in \ref{fig:slika15}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_elipsa_1_vprav1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_elipsa_1_vprav2.pdf}
+    \end{subfigure}
+    \caption{Profil normalnih komponent hitrosti panelov za elipso.} \label{fig:slika14}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_elipsa_1_U.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_elipsa_1_v.pdf}
+    \end{subfigure}
+    \caption{Hitrostno potencialno polje levo in vektorsko hitrostno polje desno za elipso.} \label{fig:slika15}
+\end{figure}
+
+\noindent Kot zadnji primer elipse imamo $\vec{v}_{\infty}=(1/2,\sqrt{3/4)}$ na slikah \ref{fig:slika16} in \ref{fig:slika17}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_elipsa_2_vprav1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_elipsa_2_vprav2.pdf}
+    \end{subfigure}
+    \caption{Profil normalnih komponent hitrosti panelov za elipso.} \label{fig:slika16}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_elipsa_2_U.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_valj_elipsa_2_v.pdf}
+    \end{subfigure}
+    \caption{Hitrostno potencialno polje levo in vektorsko hitrostno polje desno za elipso.} \label{fig:slika17}
+\end{figure}
+
+Podobno kratko analizo naredimo še za profil  NACA-0020, kjer imamo rešitve v prvem primeru za $\vec{v}_{\infty}=(1,0)$ na slikah \ref{fig:slika18} in \ref{fig:slika19}, in v drugem primeru $\vec{v}_{\infty}=(-1,0)$ na slikah \ref{fig:slika20} in \ref{fig:slika21}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_0_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_0_2.pdf}
+    \end{subfigure}
+    \caption{Profil normalnih komponent hitrosti panelov za NACA profil.} \label{fig:slika18}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_0_U.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_0_v.pdf}
+    \end{subfigure}
+    \caption{Hitrostno potencialno polje levo in vektorsko hitrostno polje desno za NACA profil.} \label{fig:slika19}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_1_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_1_2.pdf}
+    \end{subfigure}
+    \caption{Profil normalnih komponent hitrosti panelov za NACA profil.} \label{fig:slika20}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_1_U.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_1_v.pdf}
+    \end{subfigure}
+    \caption{Hitrostno potencialno polje levo in vektorsko hitrostno polje desno za NACA profil.} \label{fig:slika21}
+\end{figure}
+
+\noindent Zanimiv rezultat dobimo, če podamo vektor $\vec{v}_{\infty}=(0,1)$. V tem primeru imamo singularno točko v vogalu profila NACA. Rezultate prikazujejo slike \ref{fig:slika22}, \ref{fig:slika23}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_2_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_2_2.pdf}
+    \end{subfigure}
+    \caption{Profil normalnih komponent hitrosti panelov za NACA profil.} \label{fig:slika22}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_2_U.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_2_v.pdf}
+    \end{subfigure}
+    \caption{Hitrostno potencialno polje levo in vektorsko hitrostno polje desno za NACA profil.} \label{fig:slika23}
+\end{figure}
+\noindent Ker se na desni sliki \ref{fig:slika23} slabše vidi hitrostno polje zaradi singularne točke v vogalu, smo zaradi lepše preglednosti postavili vse hitrosti znotraj profila postavili na $\vec{v}_{\infty}$. Rezultat z lepšim zunanjim profilom toka, je prikazan na sliki \ref{fig:slika24}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.8\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_2_v2_v.pdf}
+    \end{subfigure}
+    \caption{ Vektorsko hitrostno polje za NACA profil.} \label{fig:slika24}
+\end{figure}
+
+Za konec si poglejmo še NACA profil na primeru $\vec{v}_{\infty}=(-\sqrt{3/5},\sqrt{2/5})$. Rezultate prikatujejo slike \ref{fig:slika25}, \ref{fig:slika26} in zaradi lepše preglednosti hitrostnega profila \ref{fig:slika27}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_3_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_3_2.pdf}
+    \end{subfigure}
+    \caption{Profil normalnih komponent hitrosti panelov za NACA profil.} \label{fig:slika25}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_3_U.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_3_v.pdf}
+    \end{subfigure}
+    \caption{Hitrostno potencialno polje levo in vektorsko hitrostno polje desno za NACA profil.} \label{fig:slika26}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.8\textwidth}  			
+        \includegraphics[width=\textwidth]{obtekanje_naca00_3_v2_v.pdf}
+    \end{subfigure}
+    \caption{ Vektorsko hitrostno polje za NACA profil.} \label{fig:slika27}
+\end{figure}
+
+\end{document}
