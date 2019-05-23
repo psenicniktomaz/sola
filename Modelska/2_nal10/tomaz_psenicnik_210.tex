@@ -1,0 +1,313 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene]{babel}    % naloži, med drugim, slovenske delilne vzorce
+
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{amsmath}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}} %naredi vector kot bold zapis
+
+\usepackage{float}
+
+\usepackage{amssymb}
+
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[slovene]{babel}
+%\usepackage[latin2]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{makeidx}%za stvarno kazalo
+%\makeindex%naredi stvarno kazalo
+%\usepackage{tikz}% paket za kroge
+
+\title{\textbf{Modelska analiza 2} \\ 10. naloga - Direktno reševanje Poissonove enačbe \\}
+	\author{Študent: Pšeničnik Tomaž}
+	
+	
+
+
+	
+\begin{document}
+
+\pagenumbering{gobble}
+
+	\begin{figure} [h]
+  \centering
+  \includegraphics[width=12 cm]{logo_fmf.png}
+  \maketitle
+\end{figure}
+	
+	
+	
+	\newpage
+	\pagenumbering{arabic}
+	
+	
+
+\section*{Poves kvadratne opne}
+
+Tokratna naloga je najti poves kvadratne opne, ki je obtežena kot prikazuje slika \ref{fig:slika1}. Problem že znamo rešiti z iteracijsko \textit{Jacobijevo} metodo ali podobnim postopkom in nato prevesti na postopek pospešene relaksacije, kot v nalogi 5. Na hitro se spomnimo \textit{Jacobijeve} iteracije:
+\begin{equation} \label{eq:enacba1}
+ u_{j,k} ^{n+1}= \left[h^{2}g_{j,k} + u_{j+1,k}^{n} + u_{j-1,k}^{n} + u_{j,k+1}^{n} + u_{j,k-1}^{n} \right]/4,
+\end{equation}
+kjer je $h$ razmik med dvema sosednjima točkama, $g_{j,k}$ pa obtežitev območja v dani točki. Razmik $h$ privzamemo, da je enak med vsemi sosednjimi točkami.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.3\textwidth]{lik2.pdf}
+\caption{Obtežitev po območju} \label{fig:slika1}
+\end{center}
+\end{figure} 
+
+
+
+Toda tokratno nalogo lahko rešimo z bolj učinkovito metodo, in sicer s \textit{Fourierovo} transformacijo oz. FFT (\textit{Fast Fourier Transform}). \textit{Fourierovo} metodo lahko uporabimo vedno takrat, kadar so meje področja koordinatne črte katerega od separabilnih koordinatnih sistemov (npr. pravokotnik), robni problemi pa linearni. V tokratnem primeru, ko gre za kvadrat, razvijemo območje in odmike z 2D \textit{Fourierovo} transformacijo:
+\begin{align}
+u_{j,k}= \sum_{j=0,k=0}^{N-1} U^{m,n} e^{2\pi i mj/N} e^{2\pi i nk/N}, \label{eq:enacba2} \\
+g_{j,k}=\sum_{j=0,k=0}^{N-1}  G^{m,n} e^{2\pi i mj/N} e^{2\pi i nk/N},\label{eq:enacba3}
+\end{align}
+kjer so $u$ odmiki, $g$ pa funkcija obtežitve. Z vstavitvijo enačb (\ref{eq:enacba2}) in (\ref{eq:enacba3}) v enačbo (\ref{eq:enacba1}), pridemo do koristne zveze
+\begin{equation}\label{eq:enacba4}
+U^{m,n}=\frac{h^{2} G^{m,n}}{2 \cos(2\pi m /N)\cos(2\pi n/N)-4},
+\end{equation}
+katera pa ne velja za $m=n=0$. Ker morajo biti vsi odmiki v našem primeru na robovih nič, sledi
+\begin{align}
+u_{0,0}=0 = \sum_{m=0,j=0}^{N-1} U^{m,n} \rightarrow U^{0,0}= -\sum_{\textrm{ostali}} U^{m,n}. 
+\end{align}
+Rešitev enakomerno obtežene kvadratne opne poznamo že iz naloge 5. Zato si najprej poglejmo rešitev s \textit{Fourierovo} metodo. Da zadostimo robnim pogojem ($u=0$ na robu), je potrebno območje  liho razširiti v obe strani. Razširitev je prikazana na sliki \ref{fig:slika2}
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{2dFFT_brezutezi_lik.pdf}
+\caption{Obtežitev po območju.} \label{fig:slika2}
+\end{center}
+\end{figure} 
+\noindent Tako dobimo že znano rešitev, prikazano na slikah \ref{fig:slika3}. Pri obratni transformaciji $U\rightarrow u$ dobimo skoraj povsem realne rešitve, imaginarni deli so zanemarljivo majhni.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}  			
+        \includegraphics[width=\textwidth]{2dFFT_brezutezi_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{2dFFT_brezutezi_2.pdf}     
+    \end{subfigure}
+    \caption{Na levi rešitvi so prikazani le realni deli, na desni rešitvi so prikazani absolutni odmiki leve rešitve zgornje desne slike.} \label{fig:slika3}
+\end{figure}
+
+\noindent Naredimo hitrostno primerjavo med obema metodama. Kako se dokopati do števila iteracij v knjižici \texttt{scipy.fftpack.fft2} nam žal ni uspelo, zato si poglejmo le časovno primerjavo med metodami. Seveda je potrebno vzeti v zakup, da je število iteracij pri metodi SOR toliko večje, kolikor je zahtevana natančnost. Rezultate prikazujeta sliki \ref{fig:slika10}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{time_comparance1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{time_comparance2.pdf}     
+    \end{subfigure}
+    \caption{Časovna primerjava metod levo in primerjava s številom iteracij med \textit{Jacobijevo} iteracisjko metodo in SOR  desno.} \label{fig:slika10}
+\end{figure}
+
+Sedaj se lotimo reševanja različno obteženega območja. Za referenco najprej rešimo z metodo SOR. Območje razdelimo, kot je prikazano na sliki \ref{fig:slika4}. \begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.3\textwidth]{obmocje.pdf}
+\caption{Točke podane po območju, obkrožene točke so notranje točke območja, po katerih računamo.} \label{fig:slika4}
+\end{center}
+\end{figure}
+\noindent Tako bomo uporabili malenkost modificirano enačbo \ref{eq:enacba1} in sicer:
+\begin{itemize}
+\item Vogalne točke (obkrožene zeleno - so štiri): 
+\begin{equation*}
+\tilde{u}_{j,k} ^{n}= u_{j,k} ^{n+1}= \left[h^{2}g_{j,k} + u_{j+1,k}^{n} + u_{j-1,k}^{n} + u_{j,k+1}^{n} + u_{j,k-1}^{n} \right]/6,
+\end{equation*}
+\item Robne točke (obkrožene z modro): 
+\begin{equation*}
+\tilde{u}_{j,k} ^{n}= u_{j,k} ^{n+1}= \left[h^{2}g_{j,k} + u_{j+1,k}^{n} + u_{j-1,k}^{n} + u_{j,k+1}^{n} + u_{j,k-1}^{n} \right]/5,
+\end{equation*}
+\item Vse ostale - notranje točke (obkrožene z rdečo):
+\begin{equation*}
+\tilde{u}_{j,k} ^{n}= u_{j,k} ^{n+1}= \left[h^{2}g_{j,k} + u_{j+1,k}^{n} + u_{j-1,k}^{n} + u_{j,k+1}^{n} + u_{j,k-1}^{n} \right]/4.
+\end{equation*}
+\end{itemize}
+Računali bomo le po notranjih točkah območja. Zunanje točke odmikov fiksiramo $u=0$.
+ Računali bomo po območju prikazanem na slikah \ref{fig:slika5}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{sor_obtez_1_lik.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{sor_obtez_2_lik.pdf}     
+    \end{subfigure}
+    \caption{Prvi primer levo in drugi primer desno.} \label{fig:slika5}
+\end{figure}
+
+\noindent Tako dobimo referenčni rešitvi prikazani na slikah \ref{fig:slika6}.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{sor_obtez_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{sor_obtez_2.pdf}     
+    \end{subfigure}
+    \caption{Prvi primer levo in drugi primer desno za 100x100 veliko bomočje.} \label{fig:slika6}
+\end{figure}
+
+Najprej si poglejmo, kako razširiti območje za \textit{Fourierovo} transformacijo. Razširitev območja je prikazana na sliki \ref{fig:slika7}. Območju smo dodali še zunanje točke, kateri smo pripisali vrednost obteženega območja na tej meji.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{2dFFT_utez_1_lik.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{2dFFT_utez_2_lik.pdf}     
+    \end{subfigure}
+    \caption{Prvi primer levo in drugi primer desno za 21x21 veliko območje enega kvadranta.} \label{fig:slika7}
+\end{figure}
+
+\noindent 2D \textit{Fourierovo} transformacijo poženemo po celotnem območju. Rezultata sta prikazana na slikah \ref{fig:slika8} in \ref{fig:slika9}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}  			
+        \includegraphics[width=\textwidth]{2dFFT_utez_1_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{2dFFT_utez_1_2.pdf}     
+    \end{subfigure}
+    \caption{Prvi primer za 201x201 veliko območje enega kvadranta.} \label{fig:slika8}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}  			
+        \includegraphics[width=\textwidth]{2dFFT_utez_2_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{2dFFT_utez_2_2.pdf}     
+    \end{subfigure}
+    \caption{Drugi primer za 201x201 veliko območje enega kvadranta.} \label{fig:slika9}
+\end{figure}
+
+Poglejmo si še princip kombinirane metode, pri kateri v eni smeri uporabimo sinusno FFT, v drugi smeri pa SOR. Metoda nam bo prišla prav v nadaljevanju, zato je koristno preveriti pravilnost izračunov na že znanih rezultatih za poves opne. Najprej potrebujemo območje, na katerem bomo izvedli račune. Primera območja prikazujeta sliki \ref{fig:slika12}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kombinirana_obmocje.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{kombinirana_2_obmocje.pdf}
+    \end{subfigure}
+    \caption{Območji za kvadratno opno brez obtežitve in z obtežitvijo.} \label{fig:slika12}
+\end{figure}
+\noindent Tokrat postavimo rob območja na 0, ker ne želimo odmika na robu.
+V navpični smeri bomo naredili sinusno FFT območja:
+\begin{align} \label{eq:enacba7}
+G^{m} _{ \ \ k} = \sum_j g_{j,k}2\sin(\pi j/N).
+\end{align}
+Če razvijemo še odmike po sinusni FFT:
+\begin{align}\label{eq:enacba8}
+U^{m} _{ \ \ k } =  \sum_j u_{j,k} 2 \sin(\pi j/N)
+\end{align}
+in enačbi (\ref{eq:enacba7}) in (\ref{eq:enacba8}) vstavimo v znano zvezo (\ref{eq:enacba1}), dobimo iteracijsko zvezo v \textit{Fourierovem} prostoru:
+\begin{equation}
+(U^{m} _{ \ \ k })^{n+1}= \left[(U^{m} _{ \ \ k-1 })^{n} +(U^{m} _{ \ \ k+1 })^{n} +(G^{m} _{ \ \ k })^{n} h^{2} \right] / (4-2\cos(m \pi /N)),
+\end{equation}
+s katero računamo po vseh vrsticah. Na koncu naredimo le še obratno sinusno FFT:
+\begin{equation}
+u_{j,k} = \sum _m U^{m} _{ \ \ k } \sin(m\pi j /N)/N
+\end{equation}
+in dobimo že znane rezultate prikazane na slikah \ref{fig:slika13}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.32\textwidth}  			
+        \includegraphics[width=\textwidth]{kombinirana.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\textwidth}  			
+        \includegraphics[width=\textwidth]{kombinirana_2.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.32\textwidth}  			
+        \includegraphics[width=\textwidth]{kombinirana_3.pdf}
+    \end{subfigure}
+    \caption{Poves kvadratne opne dobljen s kombinirano metodo.} \label{fig:slika13}
+\end{figure}
+
+\section*{Temperaturni profil enakostraničnega valja}
+
+
+Spomnimo se \textit{Jacobijeve} metode za cilindrične koordinate iz naloge 5:
+\begin{equation}\label{eq:enacba6}
+u_{j,k}^{n+1}=\left( g_{j,k} + \frac{u_{j,k-1}^{n} + u_{j,k+1}^{n}}{h_r ^{2}} + \frac{1}{r_k}\left(  \frac{u_{j,k+1}^{n} - u_{j,k-1}^{n}}{2h_r}\right) + \frac{u_{j-1,k}^{n} + u_{j+1,k}^{n}}{h_z ^{2}}\right)/d,
+\end{equation}
+kjer je
+\begin{equation*}
+d=\left( 
+\frac{2}{h_r^{2}}+ \frac{2}{h_r ^{2}}  \right).
+\end{equation*}
+Dobimo referenčno rešitev s to metodo, prikazano na sliki \ref{fig:slika11}, kjer valj na osnovnicah hladimo pri temperaturi 0, na straneh pa grejemo pri temperaturi 1.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}  			
+        \includegraphics[width=\textwidth]{valj_sor.pdf}
+    \end{subfigure}
+    \caption{Enakostraničen valj za 100x100 veliko območje.} \label{fig:slika11}
+\end{figure}
+
+
+Postopek lahko pospešimo, če v $z$ smeri naredimo sinusno FFT, uporabimo \textit{Jacobijevo} iteracijsko metodo v smeri $r$ in naredimo inverzno sinunso FFT v $z$ smeri. V enačbo (\ref{eq:enacba6}) vstavimo sinusne FFT transformiranke (\ref{eq:enacba7}) in (\ref{eq:enacba8}), ter ponovno dobimo iteracijsko zvezo s poljubno dolžino med vsemi sosednjimi točkami v $r$ smeri $h_r$ in $z$ smeri $h_z$:
+\begin{align} \label{eq:enacba9}
+&(U^{m} _{ \ \ k })^{n+1}  (d - \frac{1}{h_z^{2}}2\cos(\pi m /N))= \nonumber \\
+&= (G^{m} _{ \ \ k}) ^{n} + (U^{m} _{ \ \ k-1 })^{n} \left(\frac{1}{h_r ^{2}} - \frac{1}{2h_r r_k} \right) + (U^{m} _{ \ \ k+1 })^{n} \left(\frac{1}{h_r ^{2}} + \frac{1}{2h_r r_k} \right).
+\end{align}
+V tokratnem primeru rešujemo \textit{Laplaceovo} enačbo
+\begin{align*}
+\nabla ^{2} u = 0,
+\end{align*}
+tako bo območje povsod nič. Odmike na plašču bomo fiskirali na ena, kot prikazuje slika \ref{fig:slika14} in tako dobili sinusno FFT le za dva stolpca.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}  			
+        \includegraphics[width=\textwidth]{valj_kombinirana_3_obmocje.pdf}
+    \end{subfigure}
+    \caption{Začetni pogoji za enakostraničen valj s konstantno temperaturo na plašču.} \label{fig:slika14}
+\end{figure}
+\noindent Za izračun naslednjih $U^{m} _{ \ \ k }$, uporabimo dobljeno zvezo \ref{eq:enacba9}. Dobljeni rezultat prikazuje slika \ref{fig:slika15}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}  			
+        \includegraphics[width=\textwidth]{valj_kombinirana_iteracija.pdf}
+    \end{subfigure}
+    \caption{Dobljeni $U^{m} _{ \ \ k }$. } \label{fig:slika15}
+\end{figure}
+
+\noindent Preostane nam samo še inverzna sinusna FFT in dobimo znan rezultat, prikazan na sliki \ref{fig:slika16}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}  			
+        \includegraphics[width=\textwidth]{valj_kombinirana.pdf}
+    \end{subfigure}
+    \caption{Temperaturni profil valja z višjo temperaturo na osnovnicah.} \label{fig:slika16}
+\end{figure}
+
+Če želimo imeti na plašču temperaturo nič in na osnovnicah temperaturo 1, je vse kar moramo storiti, da zamenjamo enice z -1 na sliki \ref{fig:slika14} in h končnemu rezultatu prištejemo ena. Na tak način lahko dobimo tudi poljubno temperaturo na plašču in osnovnicah. Primer je prikazan na sliki \ref{fig:slika17}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.5\textwidth}  			
+        \includegraphics[width=\textwidth]{valj_kombinirana_2.pdf}
+    \end{subfigure}
+    \caption{Temperaturni profil valja z višjo temperaturo na plašču.} \label{fig:slika17}
+\end{figure}
+
+
+
+\end{document}
