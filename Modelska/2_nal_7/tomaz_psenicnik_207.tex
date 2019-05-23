@@ -1,0 +1,402 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene]{babel}    % naloži, med drugim, slovenske delilne vzorce
+
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{amsmath}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}} %naredi vector kot bold zapis
+
+\usepackage{float}
+
+\usepackage{amssymb}
+
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[slovene]{babel}
+%\usepackage[latin2]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{makeidx}%za stvarno kazalo
+%\makeindex%naredi stvarno kazalo
+%\usepackage{tikz}% paket za kroge
+
+\title{\textbf{Modelska analiza 2} \\ 7. naloga - Metoda končnih elementov: Poissonova enačba \\}
+	\author{Študent: Pšeničnik Tomaž}
+	
+	
+
+
+	
+\begin{document}
+
+\pagenumbering{gobble}
+
+	\begin{figure} [h]
+  \centering
+  \includegraphics[width=12 cm]{logo_fmf.png}
+  \maketitle
+\end{figure}
+	
+	
+	
+	\newpage
+	\pagenumbering{arabic}
+	
+	
+	
+\section*{Ne najkrajši uvod v FEM}
+
+Tokratna naloga je določiti pretok skozi polkrožno cev in pretok skozi cev iz 5. naloge s pomočjo metode končnih elementov oz. metodo FEM (Finite Element Method). Opravka imamo z že znano Poissonovo enačbo v dveh dimenzijah. Za začetek si poglejmo, kaj je to FEM in kako pridemo do uporabnih enačb.
+
+Podano imamo območje $\Omega$, za katero velja Poissonova enačba
+\begin{equation} \label{eq:enacba1}
+- \nabla ^{2} u =f,
+\end{equation}
+pri čemer je $u=u(x,y)$ iskano polje, $f(x,y)$ podana funkcija. Osredotočili se bomo na Dirichletov robni pogoj, in sicer $u=0$ na robu danega območja $\partial \Omega$. Pomnožimo enačbo (\ref{eq:enacba1}) z neko testno funkcijo $v(x,y)$ in integrirajmo po območju $\Omega$.
+\begin{equation} \label{eq:enacba2}
+\int _{\Omega} (- \nabla ^{2} u) v dS = \int _{\Omega} f v dS.
+\end{equation}
+Za testno funkcijo zahtevamo, da je $v=0$ na robu $\partial \Omega$. Z relacijo
+\begin{equation*}
+(- \nabla ^{2} u) v= \nabla u \cdot \nabla v - \nabla \cdot (\nabla u v)
+\end{equation*}
+in Gaussovim izrekom prepišemo enačbo \ref{eq:enacba2} v
+\begin{equation*}
+\int _{\Omega}  \nabla u \cdot \nabla v dS  - \int _{\partial \Omega} (\nabla u)v d\vec{s} = \int_{\Omega} fv dS .
+\end{equation*}
+Zaradi pogoja $v=0$ na $\partial \Omega$ drugi člen na levi odpade in dobimo zvezo
+\begin{equation} \label{eq:enacba3}
+\int _{\Omega} (\nabla u \cdot \nabla v  - fv) dS=0.
+\end{equation}
+
+Za iskanje rešitve variacijskega problema (\ref{eq:enacba3}), moramo le tega diskretizirati. Diskretizacije se lotimo tako, da razvijemo $u$ in $v$ po isti bazi nekega diskretnega prostora $\Phi$ z baznimi funkcijami $\phi$. Sistem, kjer uporabljamo isto bazo za razvoj testne funkcije $v$ in iskane funkcije $u$, rečemo \textit{Galerkinov sistem}. Tako imamo
+\begin{equation} \label{eq:enacba4}
+u= \sum _{j=1} ^{N} c_j \phi _j(x,y) \qquad \textrm{in} \qquad v=\sum _{j=1} ^{N} d_j \phi _j(x,y),
+\end{equation}
+in vstavimo v enačbo (\ref{eq:enacba3}) in dobimo
+\begin{equation*}
+\int _{\Omega} \nabla \left(\sum _{j=1} ^{N} c_j \phi _j\right)  \cdot \nabla \left( \sum _{i=1} ^{N} d_i \phi _i \right) = \int _{\Omega} f \sum _{i=1} ^{N} d_i \phi _i
+\end{equation*}
+oziroma 
+\begin{equation} \label{eq:enacba5}
+\sum _{j=1} ^{N} c_j \int_{\Omega} \nabla \phi_j \cdot \nabla \phi_i dS= \int _{\Omega} f \phi_i dS \qquad \forall i.
+\end{equation}
+Enačbo (\ref{eq:enacba5}) prepoznamo kot sistem linearnih enačb
+\begin{equation}
+\sum _{j=1} ^{N} A_{ij} c_j = b_i, \qquad i=1,2,...,N \rightarrow Ac=b,
+\end{equation}
+kjer sta
+\begin{align}
+A_{i,j}&= \int _{\Omega} \nabla \phi_j \cdot \nabla \phi _i dS  \label{eq:enacba7} \\
+b_i &= \int _{\Omega} f \phi _i dS. \label{eq:enacba8}
+\end{align}
+Matrika $A$ se angleško imenuje \textit{stiffness} matrika, $b$ pa \textit{load} ali \textit{source} vektor.
+
+V našem primeru za bazne funkcije $\phi$ vzamemo trikotnike z oglišči $x_1$, $x_2$, $x_3$, nad katere napeljemo tri piramide z vrhom v ogliščih tako, da velja $\phi_j(x_k,y_k)= \delta _{j,k}$. Več piramid (poljubno število) skupaj tvori bazno funkcijo. Na sliki \ref{fig:slika1} vidimo bazno funkcijo iz šestih piramid. Cilj je poračunati sistem enačb $Ac=b$, kjer dobimo koeficiente $c_j$ vrhov baznih funkcij in nato zapišemo rešitev kot $u(x,y)=\sum _j ^{N} c_j \phi _j$.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{baza.pdf}
+        \caption{Primer piramide.}
+    \end{subfigure}
+    \hspace{5em}%
+    \begin{subfigure}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{baza_2.pdf}
+        \caption{Bazna funkcija iz šestih piramid.}
+    \end{subfigure}
+    \caption{Element nad trikotnikom in bazna funkcija.} \label{fig:slika1}
+\end{figure}
+
+Sedaj si poglejmo, kako pridemo do triangulacije in do ustrezne matrike in vektorja. Najprej naredimo triangularizacijo območja $\Omega$ in izberemo $k$-ti trikotnik $\bigtriangleup _k$. Preslikati moramo referenčni trikotnik $\bigtriangleup _*$ na izbran trikotnik $\bigtriangleup _k$. Za $\bigtriangleup _*$ si isto mislimo piramide z vrhi v ogliščih.  Preslikavo prikazuje slika \ref{fig:slika2}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{jacobian.pdf}
+\caption{Preslikava iz referenčnega elementa $\bigtriangleup _*$ na dani element $\bigtriangleup _k$.} \label{fig:slika2}
+\end{center}
+\end{figure} 
+
+\noindent Za vse trikotnike ($x,y$) $\in$ $\bigtriangleup _k$ je preslikava podana kot
+\begin{align} \label{eq:enacba9}
+x(\xi, \eta)&= x_1 \chi_1(\xi, \eta) + x_2 \chi _2 (\xi, \eta) + x_3 \chi_3 (\xi, \eta) \nonumber \\
+y(\xi, \eta)&= y_1 \chi_1(\xi, \eta) + y_2 \chi _2 (\xi, \eta) + y_3 \chi_3 (\xi, \eta),
+\end{align}
+pri čemer so
+\begin{align*}
+\chi_1(\xi, \eta)&= 1- \xi - \eta \\
+\chi_2(\xi, \eta)&= \xi \\
+\chi_3(\xi, \eta)&= \eta
+\end{align*}
+piramide nad referenčnim $\bigtriangleup _*$ in ustrezajo:
+\begin{align*}
+&\chi_1(0,0)= 1 &\qquad &\chi_1(1,0)= 0 &\qquad &\chi_1(0,1)= 0 \\
+&\chi_2(0,0)= 0 &\qquad &\chi_2(1,0)= 1 &\qquad &\chi_2(0,1)= 0 \\
+&\chi_3(0,0)= 0 &\qquad &\chi_3(1,0)= 0 &\qquad &\chi_3(0,1)= 1
+\end{align*}
+
+Preslikava iz referenčnega $\bigtriangleup _*$ na $\bigtriangleup _k$ mora biti diferenciabilna. Obstaja diferenciabilna funkcija $\varphi (\xi, \eta)$ (računamo za splošen primer, za naš primer si lahko predstavljamo $\varphi_i (\xi, \eta) = \chi _i(\xi, \eta) $), kateri lahko transformiramo odvode preko
+\begin{equation} \label{eq:enacba10}
+\begin{bmatrix}
+ \frac{ \partial \varphi}{\partial \xi}\\ 
+\frac{\partial \varphi}{\partial \eta }
+\end{bmatrix} = 
+\begin{bmatrix}
+ \frac{\partial x}{ \partial \xi}& \frac{\partial y}{ \partial \xi}\\ 
+ \frac{\partial x}{ \partial \eta}& \frac{\partial y}{ \partial \eta} 
+\end{bmatrix}
+\begin{bmatrix}
+ \frac{ \partial \varphi}{\partial x}\\ 
+\frac{\partial \varphi}{\partial y }
+\end{bmatrix}.
+\end{equation}
+V transformaciji (\ref{eq:enacba10}) nastopa \textit{Jacobijeva matrika} enega trikotnega elementa, ki jo enostavno poračunamo iz zvez (\ref{eq:enacba9}) in dobimo
+\begin{equation}
+J_k = \frac{\partial(x,y)}{\partial (\xi,\eta)}=
+\begin{bmatrix}
+x_2-x_1 & y_2 -y_1 \\
+x_3 -x_1 & y_3 -y_1
+\end{bmatrix}.
+\end{equation}
+V tem enostavnem primeru vidimo, da je $J_k$ konstanta matrika na referenčnem elementu $\bigtriangleup _*$, determinanta matrike pa je enaka dvakratniku ploščine $\bigtriangleup _k$
+\begin{equation}
+|J_k|=\begin{vmatrix}
+ 1& x_1 &y_1 \\ 
+ 1& x_2 & y_2\\ 
+ 1& x_3 & y_3
+\end{vmatrix} = 2| \bigtriangleup _k|.
+\end{equation}
+
+Dejstvo, da $|J_k(\xi, \eta)| \neq 0$ za vse točke $(\xi, \eta) \in \bigtriangleup _*$ zagotavlja, da obstaja obratna preslikava $\bigtriangleup _k$ na $\bigtriangleup _*$, ki je enolično določena in je diferenciabilna. To pomeni, da lahko transformacijo odvodov (\ref{eq:enacba10}) obrnemo in dobimo
+\begin{equation} \label{eq:enacba13}
+\begin{bmatrix}
+\frac{ \partial \varphi}{\partial x}\\ 
+\frac{\partial \varphi}{\partial y }
+\end{bmatrix} = 
+\begin{bmatrix}
+ \frac{\partial \xi}{ \partial x}& \frac{\partial \eta}{ \partial x}\\ 
+ \frac{\partial \xi}{ \partial y}& \frac{\partial \eta}{ \partial y} 
+\end{bmatrix}
+\begin{bmatrix}
+ \frac{ \partial \varphi}{\partial \xi}\\ 
+\frac{\partial \varphi}{\partial \eta }
+\end{bmatrix}.
+\end{equation}
+Vidimo, da odvodi funkcij definiranih na $\bigtriangleup _k$ zadoščajo
+\begin{align} \label{eq:enacba14}
+&\frac{\partial \xi}{x}= \frac{1}{|J_k|}\frac{\partial y}{\partial \eta}, &\frac{\partial \eta}{x}= -\frac{1}{|J_k|}\frac{\partial y}{\partial \xi} \nonumber \\
+&\frac{\partial \xi}{y}= -\frac{1}{|J_k|}\frac{\partial x}{\partial \eta}, &\frac{\partial \eta}{y}= \frac{1}{|J_k|}\frac{\partial x}{\partial \xi}.
+\end{align}
+S podano bazno funkcijo $\psi_{*,i}$ na referenčnem elementu $\bigtriangleup _*$ (ponovno si predstavljamo, da so naše bazne funkcije $\psi_{*,i}=\chi$), matriko $A_{ij} ^{k}$  $k$-tega elementa enostavno poračunamo iz enačbe (\ref{eq:enacba7})
+\begin{align} \label{eq:enacba15}
+A_{ij} ^{k}&= \int _{\bigtriangleup _k} \left( \frac{\partial \psi _{k,i}}{\partial x} \frac{ \partial \psi_{k,j}}{\partial x} + \frac{\partial \psi _{k,i}}{\partial y} \frac{ \partial \psi_{k,j}}{\partial y} \right) dx dy \nonumber \\
+&= \int _{\bigtriangleup _*}
+\left(  
+\frac{\partial \psi _{*,i}}{\partial x} \frac{ \partial \psi_{*,j}}{\partial x} + \frac{\partial \psi _{*,i}}{\partial y} \frac{ \partial \psi_{*,j}}{\partial y}
+\right)
+|J_k| d\xi d \eta.
+\end{align}
+V našem primeru velja, da so bazne funkcije $\psi _{*,i}=\chi _i$, je smiselno upeljati sledeče koeficiente:
+\begin{align*}
+b_1= y_2 -y_3; \ \ b2= y_3 -y_1; \ \ b_3= y_1 -y_2; \\
+c_1 = x_3 -x_2; \ \ c_2 = x_1 -x_3; \ \ c_3 = x_2 -x_1;
+\end{align*}
+in v tem primeru dobimo iz enačb (\ref{eq:enacba13}) in (\ref{eq:enacba14}) zvezo med odvodi
+\begin{align} \label{eq:enacba16}
+\begin{bmatrix}
+\frac{ \partial \varphi}{\partial x}\\ 
+\frac{\partial \varphi}{\partial y }
+\end{bmatrix} = \frac{1}{2|\bigtriangleup _k|}
+\begin{bmatrix}
+ b_2& b_3\\ 
+ c_2& c_3
+\end{bmatrix}
+\begin{bmatrix}
+ \frac{ \partial \varphi}{\partial \xi}\\ 
+\frac{\partial \varphi}{\partial \eta }
+\end{bmatrix}.
+\end{align}
+Zvezo (\ref{eq:enacba16}) vstavimo v (\ref{eq:enacba15}) in dobimo lokalno matriko $A^{k}$
+\begin{align*}
+A_{ij}^{k} =& \int _{\bigtriangleup _*} \left( b_2 \frac{\partial \psi_{*,i}}{\partial \xi} + b_3 \frac{ \partial \psi _{*,i}}{\partial \eta} \right)
+\left( b_2 \frac{\partial \psi_{*,j}}{\partial \xi} + b_3 \frac{ \partial \psi _{*,j}}{\partial \eta} \right) \frac{1}{|J_k|} d\xi d\eta \\
+&+ \left( c_2 \frac{\partial \psi_{*,i}}{\partial \xi} + c_3 \frac{ \partial \psi _{*,i}}{\partial \eta} \right)
+\left( c_2 \frac{\partial \psi_{*,j}}{\partial \xi} + c_3 \frac{ \partial \psi _{*,j}}{\partial \eta} \right) \frac{1}{|J_k|} d\xi d\eta.
+\end{align*}
+Z vstavitvijo $\psi _{*,i}= \chi _i$ dobimo znano zvezo, ki je zapisana v RMF za izračun lokalne matrike $A^{k}$
+\begin{equation} \label{eq:enacba17}
+A^{k}_{ij}=\frac{1}{2|J_k|} (y_{i+1} - y_{i+2} , \ \ x_{i+2} - x_{i+1})
+\begin{pmatrix}
+ y_{j+1} - y_{j+2} \\ x_{j+1} - x_{j+1}
+\end{pmatrix}.
+\end{equation}
+Izračun lokalnega vektorja $b^{k}$ iz enačbe (\ref{eq:enacba8}) je enostavnejši
+\begin{equation*}
+b^{k}_i= \int _{\bigtriangleup _k} f(x,y) \psi_{k,i}=\frac{1}{3} \frac{|J_k|}{2}f(x_T, y_T) 
+\end{equation*}
+in je kar enak volumnu piramide pomnožen s funkcijo $f$ v težišču trikotnika $\bigtriangleup _k$. Tako pridemo do druge enačbe v RMF za izračun lokalnega vektorja $b^{k}_i$
+\begin{equation}\label{eq:enacba18}
+b^{k}_i= \frac{1}{6} det
+\begin{pmatrix}
+ x_{i+1} - x_i& x_{i+2} - x_i \\
+ y_{i+1} -y_i& y_{i+1} - y_i
+\end{pmatrix}
+f(x_T,y_T).
+\end{equation}
+Primerna je opomba. V enačbah (\ref{eq:enacba17}) in (\ref{eq:enacba18}) upoštevamo podzapis $i+1...$ kot modul števila 3.
+
+Vse kar nam preostane še, je izračun globalne matrike $A$ in globalnega vektorja $b$. To storimo tako, da seštevamo po vseh trikotnikih v triangulaciji
+\begin{align*}
+\textrm{zanka po trikotnikih:} \ \ k=& 1,2,...N_k \\
+& A_{\mathcal{T}(k,i), \mathcal{T}(k,j)} += A^{k} _{ij} \\
+& b_{\mathcal{T}(k,i)}+=b^{k}_i
+\end{align*}
+kjer je $\mathcal{T}$ številka točke trikotnika.
+Najlažje pokažemo algoritem na primeru. Izberemo si poljuben trikotnik $k$ v naši triangulaciji. Njegova oglišča so označena po vrsti z npr. 1,3,6. K globalni matriki $A$ prištejemo potem 9 členov $A_{1,1}+=A^{k}_{1,1}$, $A_{1,3} += A^{k}_{1,2}$, $A_{1,6}+=A^{k}_{1,3}$, $A_{3,1}+=A^{k}_{2,1}$, $A_{3,3}+=A^{k}_{2,2}$, $A_{3,6}+=A^{k}_{2,3}$, $A_{6,3}+=A^{k}_{3,2}$ in $A_{6,6}+=A^{k}_{3,3}$.
+
+\section*{Pretok skozi kvadratno cev}
+
+Preizkus delovanja algoritma je najlažje opraviti na enostavnem primeru. To je primer pretoka tekočine skozi kvadratno cev. Rešujemo primer za konstantno funkcijo $f=1$. Metode smo se lotili tako, da smo območje kvadrata triagonalizirali z \textit{Delaunayjevo triagonalizacijo} s pomočjo knjižice \textsf{scipy.spatial.Delaunay}, pred tem smo morali določiti točke na robu in območju. Za začetni problem smo podali triagonalizacijo prikazano na sliki \ref{fig:slika3}.
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{kvadrat_tri_1.pdf}
+\caption{Začetna triagonalizacija za kvadraten presek.} \label{fig:slika3}
+\end{center}
+\end{figure} 
+
+\noindent Triagonalizacija nam da dve različni bazni funkciji. Eno z osmimi piramidami - točka (0.5,1/3) in eno s 4 piramidami - točka (0.5,2/3). Po dani triagonalizaciji smo izračunali globalno matriko $A$ in po končanem računanju vse elemente matrike $A$, ki so na robu postavili na 0. Podobn smo storili z globalnim vektorjem $b$. Tako dobimo 2x2 simetrično matriko $A$ ustrezen vektor $b$ z dvema elementoma. Rezultat je prikazan na sliki \ref{fig:slika4}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{kvadrat_1.pdf}
+\caption{Rezultat k triagonalizaciji \ref{fig:slika3}.} \label{fig:slika4}
+\end{center}
+\end{figure} 
+
+\noindent Slika \ref{fig:slika4} je sicer čudna, saj program \textit{Python} nekako sam interpolira vmesna območja. Prikazati smo želeli, da dobimo za notranji točki - bazni funkciji različno velika koeficienta $c_1$ in $c_2$, čeprav bi pričakovali, da bosta imeli točki isto vrednost. Razlog tiči v obliki triagonalizacije, ki posledično vpliva na izračun vektorja $b$. Med iskanjem literature, sem naletel na že spisano kodo v \textit{Matlabu} za pretok skozi kvadratno cev. Za enako število točk, kot na sliki \ref{fig:slika3} dobimo zaradi drugačne triagonalizacije bolj pričakovan-simetričen rezultat. Rešitev je prikazana na sliki \ref{fig:slika6}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{kvadrat_femcode.png}
+\caption{Matlabova rešitev.} \label{fig:slika6}
+\end{center}
+\end{figure} 
+
+Kljub temu, da je mogoče prvi izračun nekako nepričakovan, dobimo za bolj gosto posejane točke pričakovan rezultat. Triagonalizacijo in pretok z mnogo gostejšo posajenostjo točk (30x30) prikazujeta sliki \ref{fig:slika5}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}  			
+        \includegraphics[width=\textwidth]{kvadrat_tri_2.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadrat_2.pdf}
+    \end{subfigure}
+    \caption{Triagonalizacija in pretok za kvadratno cev.} \label{fig:slika5}
+\end{figure}
+
+
+\section*{Polkrožna cev}
+
+Račune smo ponovili za polkrožno cev. Rezultati so prikazani na slikah \ref{fig:slika7}, \ref{fig:slika8}, \ref{fig:slika9}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_tri_7.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{polkrog_7.pdf}
+    \end{subfigure}
+    \caption{Triagonalizacija in pretok za polkrožno cev z malo gostoto točk.} \label{fig:slika7}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_tri_15.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{polkrog_15.pdf}
+    \end{subfigure}
+    \caption{Triagonalizacija in pretok za polkrožno cev s srednjo gostoto točk.} \label{fig:slika8}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{polkrog_tri_30.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{polkrog_30.pdf}
+    \end{subfigure}
+    \caption{Triagonalizacija in pretok za polkrožno cev z veliko gostoto točk.} \label{fig:slika9}
+\end{figure}
+
+Poleg že napisane kode v \textit{Matlabu} za kvadratno cel, smo odkrili, da ima \textit{Matlab} že vgrajeno orodje za reševanje parcialnih diferencialnih enačb z metodo FEM. Orodje se prikliče z ukazom \textsf{pdetool}. V novem oknu, ki se odpre, lahko narišemo območja, določimo robne pogoje, tip enačbe... Program sam naredi račune in izvrže rezultat. Tak način je uporabniku zelo prijazen, toda izgubi se določeno razumevanje metode. Za referenco smo naredili izračun za polkrožno cev v tem programu in dobili enak rezultat. Rezultat je prikazan na sliki \ref{fig:slika10}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{polkrog_matlab_1.png}
+\caption{Matlabova rešitev v \textsf{pdetool}.} \label{fig:slika10}
+\end{center}
+\end{figure} 
+
+\section*{Pretok skozi poljubno obliko}
+
+Račune smo ponovili še za cev, iz naloge 5. Rezultati so prikazani na slikah \ref{fig:slika11}, \ref{fig:slika12}, \ref{fig:slika13}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{lik_tri_3.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{lik_3.pdf}
+    \end{subfigure}
+    \caption{Triagonalizacija in pretok za izbrano cev z malo gostoto točk.} \label{fig:slika11}
+\end{figure}
+
+\noindent Na sliki \ref{fig:slika11} ponovno vidimo določene čudne interpolacije.
+Nekateri trikotniki ležijo v območju, ki ga ne bi želeli imeti triagonaliziranega, saj je tam pretok 0. Skrb je povsem odveč, saj postavimo robnim točkam vrednost na 0 in vse bazne funkcije izven iskanega območja ne bodo prispevale k računu.
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{lik_tri_9.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{lik_9.pdf}
+    \end{subfigure}
+    \caption{Triagonalizacija in pretok za izbrano  cev s srednjo gostoto točk.} \label{fig:slika12}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{lik_tri_14.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{lik_14.pdf}
+    \end{subfigure}
+    \caption{Triagonalizacija in pretok za izbrano  cev z veliko gostoto točk.} \label{fig:slika13}
+\end{figure}
+
+\noindent Dobimo že znane rezultate. Za referenco smo poračunali še z \textit{Matlabovim} orodjem \textsf{pdetool} in dobili enak rezultat.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{lik_matlab.png}
+\caption{Matlabova rešitev v \textsf{pdetool}.} \label{fig:slika14}
+\end{center}
+\end{figure}
+
+
+\end{document}
