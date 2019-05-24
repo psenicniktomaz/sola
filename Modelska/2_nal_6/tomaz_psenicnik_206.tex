@@ -1,0 +1,639 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene]{babel}    % naloži, med drugim, slovenske delilne vzorce
+
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{amsmath}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}} %naredi vector kot bold zapis
+
+\usepackage{float}
+
+\usepackage{amssymb}
+
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[slovene]{babel}
+%\usepackage[latin2]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{makeidx}%za stvarno kazalo
+%\makeindex%naredi stvarno kazalo
+%\usepackage{tikz}% paket za kroge
+
+\title{\textbf{Modelska analiza 2} \\ 6. naloga - Parcialne diferencialne enačbe: lastne rešitve \\}
+	\author{Študent: Pšeničnik Tomaž}
+	
+	
+
+
+	
+\begin{document}
+
+\pagenumbering{gobble}
+
+	\begin{figure} [h]
+  \centering
+  \includegraphics[width=12 cm]{logo_fmf.png}
+  \maketitle
+\end{figure}
+	
+	
+	
+	\newpage
+	\pagenumbering{arabic}
+	
+	
+	
+\section*{Nihanje kvadratne opne}
+
+Določiti želimo nekajn najnižjih lastnih frekvenc in lastnih nihanj kvadratne opne prikazane na sliki \ref{fig:slika1}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.3\textwidth]{lik2.pdf}
+\caption{Kvadratna opna z različno obtežitvijo} \label{fig:slika1}
+\end{center}
+\end{figure} 
+
+\noindent Preden se lotimo zastavljenega problema, si poglejmo izračun lastnih nihajnih načinov navadne homogene opne.
+
+Splošno nihanje v dveh dimenzijah opisuje valovna enačba v ravnini, ki jo zapišemo kot
+\begin{equation} \label{eq:enacba1}
+\nabla ^{2} = \frac{1}{c(x,y)^{2}} \frac{\partial ^{2} u}{\partial t^{2}}, \qquad c(x,y)^{2}= \frac{\gamma}{\rho(x,y) d} = \frac{\gamma}{\sigma (x,y)},
+\end{equation}
+kjer je $c$ hitrost valovanja v točki $(x,y)$, $\gamma$ površinska napetost opne, $\rho$ gostota opne, $d$ debelina opne in $\sigma$ ploskovna gostota opne. Kot poznamo, lahko na enačbi (\ref{eq:enacba1}) uporabimo separacijo spremenljivk
+\begin{equation*}
+u=u_0(x,y)T(t) \rightarrow u_0(x,y) e^{-i\omega t}.
+\end{equation*}
+Naša enačba se s tem poenostavi in dobimo
+\begin{equation} \label{eq:enacba2}
+\nabla ^{2} u = \frac{ \omega ^{2}}{c^{2}} u = k^{2} u = \lambda u. 
+\end{equation}
+Z \textit{Dirichletovimi} robnimi pogoji ubistvu iščemo lastne vrednosti $\lambda _n$ zastavljenega problema. Lastne vrednosti v tem primeru niso nič drugega kot lastne frekvence iskanih nihajnih načinov.
+
+Analitične rešitve niso vedno možne, zato prevedemo problem na numerično reševanje. Kot poznamo iz prejšnje naloge, zapišemo enačbo (\ref{eq:enacba2}) v diferenčni obliki:
+\begin{equation}
+\nabla ^{2} u \approx \frac{4u_{i,j}-u_{i-1,j} - u_{i+1,j} - u_{i,j-1} - u_{i,j+1}}{h^{2}}= k^{2}u_{i,j}.
+\end{equation}
+Če nam uspe skonstruirati operator $\nabla^{2}$ kot matriko in $u$ kot vektor, lahko rešujemo matrični problem lastnih vrednosti
+\begin{equation}
+\textbf{\textrm {A}}\vec{u}= k^{2} \vec{u} = \lambda \vec{u}.
+\end{equation}
+Najprej zapišemo $u$ kot vektor
+\begin{equation}
+\vec{u}=(u_{0,0}, u_{0,1}, u_{0,2},... ,u_{0,N}, u_{1,0}, u_{1,1},...,u_{1,N}, u_{2,0},..., u_{N,N},
+\end{equation}
+pri čemer so $u_{i,j}$ elementi matrike odmikov \textbf{U}. Zaradi Dirichletovega robnega pogoja so robni elementi matrike \textbf{U} enaki 0. Rešujemo problem, kjer nas zanimajo le notranji elementi. Z danim vektorjem $\vec{u}$, zapišemo operator $\nabla ^{2}$ kot matriko \textbf{A} kot:
+\begin{equation}
+\textbf{\textrm {A}} = \begin{bmatrix}
+T & -I & 0 & 0\\
+-I & T & \ddots & 0\\
+0 & \ddots & \ddots & -I\\
+0 & 0 & -I & T
+\end{bmatrix}, \qquad T= \begin{bmatrix}
+4 & -1 & 0 & 0 \\
+-1 & 4 & \ddots & 0  \\
+ 0 & \ddots & \ddots &  -1\\
+0 & 0 &   -1 & 4
+\end{bmatrix}
+\end{equation}
+Za primer $N=3$, dobimo 9x9 matriko:
+\begin{equation*}
+\begin{bmatrix}
+4 & -1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 \\
+-1 & 4 & -1 & 0 & -1 & 0 & 0 & 0 & 0 \\
+0 & -1 & 4 & 0 & 0 & -1 & 0 & 0 & 0 \\
+-1 & 0 & 0 & 4 & -1 & 0 & -1 & 0 & 0 \\
+0 & -1 & 0 & -1 & 4 & -1 & 0 & -1 & 0 \\
+0 & 0 & -1 & 0 & -1 & 4 & 0 & 0 & -1 \\
+0 & 0 & 0 & -1 & 0 & 0 & 4 & -1 & 0 \\
+0 & 0 & 0 & 0 & -1 & 0 & -1 & 4 & -1 \\
+0 & 0 & 0 & 0 & 0 & -1 & 0 & -1 & 4 
+\end{bmatrix}  
+\end{equation*}
+
+
+Lastne vrednosti in lastne vektorje poiščemo s pomočjo uporabniku prijaznima knjižicama \textsf{scipy.sparse.linalg.eigsh} ali \textsf{scipy.linalg.eigh}. Če zapišemo lastne vektroje nazaj kot matriko \textbf{U}, dobimo rešitev za lastni nihajni način. Poglejmo si prvih nekaj rešitev.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_nihajni1_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_nihajni1_2.pdf}
+    \end{subfigure}
+    \caption{Prvi nihajni način.} \label{fig:slika2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_nihajni2_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_nihajni2_2.pdf}
+    \end{subfigure}
+    
+        \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_nihajni3_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_nihajni3_2.pdf}
+    \end{subfigure}
+    
+    \caption{Drugi nihajni način.} \label{fig:slika3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_nihajni4_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_nihajni4_2.pdf}
+    \end{subfigure}
+    \caption{Tretji nihajni način.} \label{fig:slika4}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_nihajni5_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_nihajni5_2.pdf}
+    \end{subfigure}
+    
+        \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_nihajni6_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_nihajni6_2.pdf}
+    \end{subfigure}
+    
+    \caption{Četrti nihajni način.} \label{fig:slika5}
+\end{figure}
+
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+n & i  j                                                & $\pi ^{2}(i^{2} + j^{2})$ & $\lambda_n \cdot (N+1)^{2}$ \\ \hline
+1 & 1  1                                                & 19.7392                   & 19.7376     \\ \hline
+2 & \begin{tabular}[c]{@{}l@{}}1  2\\ 2  1\end{tabular} & 49.3480                   & 49.3342     \\ \hline
+3 & 2  2                                                & 78.9568                   & 78.9309     \\ \hline
+4 & \begin{tabular}[c]{@{}l@{}}3  1\\ 3  1\end{tabular} & 98.6960                   & 98.6295     \\ \hline
+5 & \begin{tabular}[c]{@{}l@{}}3  2\\ 3  2\end{tabular} & 128.3049                  & 128.2261    \\ \hline
+6 & \begin{tabular}[c]{@{}l@{}}4  1\\ 1  4\end{tabular} & 167.7833                  & 167.5748    \\ \hline
+\end{tabular}
+\end{center}
+\caption{Prvih 6 izračunanih lastnih vrednosti za homogeno opno za $N=99$.}
+\label{table:tabela1}
+\end{table}
+
+Poglejmo si še, kako naraščajo lastne vrednosti za $N=99$.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_eigenvalues.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{kvadratna_opna_1_eigenvalues2.pdf}
+    \end{subfigure}
+    \caption{Naraščanje  lastnih vrednosti za $N=99$.} \label{fig:slika6}
+\end{figure}
+\noindent Graf ki ga dobimo na sliki \ref{fig:slika6} levo, ima enako obliko za katerikoli $N$. Rezultat za različne $N$ je prikazan na sliki \ref{fig:slika7}. Na grafu na desni na sliki \ref{fig:slika6} so lepo razvidne enojne in dvojne lastne vrednosti.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.73\textwidth]{kvadratna_opna_0_eigenvalues.pdf}
+\caption{Lastne vrednosti za homogeno opno za različne $N$ } \label{fig:slika7}
+\end{center}
+\end{figure}
+
+
+Sedaj se posvetimo danemu problemu: izračunu lastnih nihanj obtežene opne. Rešujemo bolj splošen problem lastnih vrednosti in lastnih vektorjev:
+\begin{equation}
+\textbf{\textrm{A}} \vec{u}= \lambda B \vec{u},
+\end{equation}
+kjer je $B$ matrika in je krajevno odvisna. V matriki $B$ imamo podano gostoto opne na mestih $x,y$. Na našo srečo je matrika $B$ diagonalna zaradi našega zapisa vektorja $\vec{u}$. Tako lahko za reševanje enostavno uporabimo knjižici \textsf{scipy.sparse.linalg.eigsh} ali \textsf{scipy.linalg.eigh}.
+
+Pojavi se problem, kako izbrati točke, kjer bomo odbrali gostoto opne. Odločimo se, da bomo odbirali točke po območju, kot prikazuje slika \ref{fig:slika8}. V prejšnjem primeru za nihanje opne smo imeli točke postavljene na rob območja. 
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.25\textwidth]{obmocje.pdf}
+\caption{Točke izbiramo po območju} \label{fig:slika8}
+\end{center}
+\end{figure}
+
+\noindent Zaradi te postavitve točk, se spremeni Poissonova enačba v diferenčni obliki. Izračunajmo drugi odvod v $x$ smeri najbolj zgornje leve točke na sliki \ref{fig:slika8}. Odvod v $y$ smeri dobimo na enak način. Za prvi odvod dobimo:
+\begin{equation} \label{eq:enacba8}
+\frac{d u}{dx} \biggr|_{x=(j-.5)h} \approx \frac{u_{i,j} - u_{i,j-1}}{h/2}, \qquad \frac{d u}{dx} \biggr|_{x=(j-.5)h} \approx \frac{u_{i,j+1} - u_{i,j}}{h},
+\end{equation}
+kjer je potrebno paziti na razmik med točkami $h$ in $h/2$. V primeru zgornje leve točke imamo $i=j=1$ in $u_{1,0}=0$.
+Da dobimo drugi odvod samo odštejemo enačbi (\ref{eq:enacba8}) in delimo s $h$:
+\begin{equation}
+\frac{d^{2} u}{d x^{2}} \biggr|_{1,1}  \approx \frac{3u_{1,1} - u_{1,2}}{h^{2}}.
+\end{equation}
+Z upoštevanjem še odvoda $y$ dobimo spremenjeno matriko \textbf{A}:
+\begin{equation}
+\textbf{\textrm {A}} = \begin{bmatrix}
+T_1 & -I & 0 & \hdots & 0 \\
+-I & T_2 & \ddots &  & \vdots \\
+0 & \ddots & \ddots & \ddots & 0\\
+\vdots &  & -I & T_2 &-I \\
+0 & \hdots & 0 & -I & T_1
+\end{bmatrix},
+\end{equation}
+pri čemer sta
+\begin{equation*}
+T_2= \begin{bmatrix}
+5 & -1 & 0 & \hdots & 0 \\
+ -1 & 4 & \ddots &  & \vdots  \\
+ 0 &  \ddots & \ddots &  \ddots & 0 \\
+\vdots & \ddots & \ddots &  4 &-1\\
+0 & \hdots &  0 &-1   &5
+\end{bmatrix}
+, \qquad T_1= \begin{bmatrix}
+6 & -1 & 0 & \hdots & 0 \\
+ -1 & 5 & \ddots &  & \vdots  \\
+ 0 &  \ddots & \ddots &  \ddots & 0 \\
+\vdots & \ddots & \ddots &  5 &-1\\
+0 & \hdots &  0 &-1   &6
+\end{bmatrix}
+\end{equation*}
+Za primer $N=3$, dobimo 9x9 matriko:
+\begin{equation*}
+\begin{bmatrix}
+6 & -1 & 0 & -1 & 0 & 0 & 0 & 0 & 0 \\
+-1 & 5 & -1 & 0 & -1 & 0 & 0 & 0 & 0 \\
+0 & -1 & 6 & 0 & 0 & -1 & 0 & 0 & 0 \\
+-1 & 0 & 0 & 5 & -1 & 0 & -1 & 0 & 0 \\
+0 & -1 & 0 & -1 & 4 & -1 & 0 & -1 & 0 \\
+0 & 0 & -1 & 0 & -1 & 5 & 0 & 0 & -1 \\
+0 & 0 & 0 & -1 & 0 & 0 & 6 & -1 & 0 \\
+0 & 0 & 0 & 0 & -1 & 0 & -1 & 5 & -1 \\
+0 & 0 & 0 & 0 & 0 & -1 & 0 & -1 & 6 
+\end{bmatrix}  
+\end{equation*}
+
+\newpage Fizika se zaradi spremembe odbiranja območja ne bi smela spremeniti. V to se hitro prepričamo, če pogledamo lastne vrednosti in lastne nihajne načine.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{opna_tockevobmocju2_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{opna_tockevobmocju2_2.pdf}
+    \end{subfigure}
+    \caption{Naraščanje  lastnih vrednosti za $N=50$ za odbiranje točk po območju.} \label{fig:slika9}
+\end{figure}
+
+\noindent Lastni načini tudi ostanejo isti. Ugotovili pa smo nekaj, na kar prej nismo bili pozorni. Druga nihajna načina na sliki \ref{fig:slika3} nista osnovna nihajna načina, temveč linearna kombinacija nihajnih načinov, prikazanih na sliki \ref{fig:slika10}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{72u1_u2.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{72u1__u2.pdf}
+    \end{subfigure}
+    \caption{Druga lastna nihajna načina za $N=72$.} \label{fig:slika10}
+\end{figure}
+S kombinacijo slik \ref{fig:slika10} (1. + 2.)/2 oz. (1. - 2.)/2 dobimo še dve lastna nihajna načina, prikazana na sliki \ref{fig:slika11}. Omeniti je mogoče še potrebno, da smo za različne $N$ dobivali različne linearne kombinacije drugega nihajnega načina in za le posebej dobro izbran $N$ smo dobili željene rešitve.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{72u1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{72u2.pdf}
+    \end{subfigure}
+    \caption{Linearna kombinacija načinov iz \ref{fig:slika10} za $N=72$.} \label{fig:slika11}
+\end{figure}
+
+\noindent Podobno dobimo linearno kombinacijo  tudi za četrti nihajni način prikazan na sliki \ref{fig:slika12}  iz slike \ref{fig:slika5}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{opna_tockevobmocju_4nihajni1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{opna_tockevobmocju_4nihajni2.pdf}
+    \end{subfigure}
+    \caption{Linearna kombinacija načinov iz \ref{fig:slika5} za $N=70$.} \label{fig:slika12}
+\end{figure}
+
+Sedaj si poglejmo, ko imamo opno z različno gostoto. Problema se lotimo tako, da najprej zapišemo matriko $B$ s pomočjo elementov $b_{i,j}$, prikazanimi na sliki \ref{fig:slika13}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.35\textwidth]{lik_python.pdf}
+\caption{Izbrana gostota po območju.} \label{fig:slika13}
+\end{center}
+\end{figure}
+
+\noindent Za prvi primer si izberemo gostoto belega območja $\rho_1= 0.5$ in črnega območja $\rho_2=5$. Za začetek si poglejmo lastne vrednosti za $N=70$, prikazane na sliki \ref{fig:slika14}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez1_eigenvalues1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez1_eigenvalues2.pdf}
+    \end{subfigure}
+    \caption{Lastne vrednosti za $\rho_1= 0.5$, $\rho_2=5$ za $N=70$.} \label{fig:slika14}
+\end{figure}
+
+\noindent V drugem primeru samo zamenjamo gostoto opne in imamo gostoto belega območja $\rho_1= 5$ in črnega območja $\rho_2=0.5$. Lastne vrednosti za ta primer so prikazane na sliki \ref{fig:slika15}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez1_1_eigenvalues1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez1_1_eigenvalues2.pdf}
+    \end{subfigure}
+    \caption{Lastne vrednosti za $\rho_1= 5$, $\rho_2=0.5$ za $N=70$.} \label{fig:slika15}
+\end{figure}
+
+
+\noindent Prvi lastni nihajni način za oba primera je prikazan na sliki \ref{fig:slika16}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez4_2.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez4_1_2.pdf}
+    \end{subfigure}
+    \caption{Prvi lastni nihajni način. Levo za $\rho_1= 0.5$, $\rho_2=5$ in desno za $\rho_1= 5$, $\rho_2=0.5$ pri $N=70$.} \label{fig:slika16}
+\end{figure}
+
+\noindent Podobno kot pri homogeni opni, tudi pri nehomogeni opni dobimo 2 lastna načina drugega nijanega načina. Ponovno naredimo linerani kombinacijiji za pridobitev še dodatnih dveh nihajnih načinov. Za prvi primer so prikazani rezultati drugega nihajnega načina na sliki \ref{fig:slika17} in \ref{fig:slika18}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{obtez2_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{obtez2_2.pdf}
+    \end{subfigure}
+    \caption{Drugi lastni nihajni način za $\rho_1= 0.5$, $\rho_2=5$ pri $N=70$.} \label{fig:slika17}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{obtez2_3.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{obtez2_4.pdf}
+    \end{subfigure}
+    \caption{Linearna kombinacija načinov iz \ref{fig:slika17} $\rho_1= 0.5$, $\rho_2=5$ pri $N=70$.} \label{fig:slika18}
+\end{figure}
+
+\noindent Drugi primer drugih lastnih nihajnih načinov in njunih linearnih kombinacij vidimo na slikah \ref{fig:slika19} in \ref{fig:slika20}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez2_1_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez2_1_2.pdf}
+    \end{subfigure}
+    \caption{Drugi lastni nihajni način za $\rho_1= 5$, $\rho_2=0.5$ pri $N=70$.} \label{fig:slika19}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez2_1_3.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez2_1_4.pdf}
+    \end{subfigure}
+    \caption{Linearna kombinacija načinov iz \ref{fig:slika19} za $\rho_1= 5$, $\rho_2=0.5$ pri $N=70$.} \label{fig:slika20}
+\end{figure}
+
+\noindent Kot primeren komentar k dozdajnšnjim slikam, dodamo, da najbolj nihajo oz. imajo največjo amplitudo nihanja gostejši- težji deli. To najlajže vidimo tako, da si na vseh slikah z različno gostoto predstavljamo sliko \ref{fig:slika13}.
+
+Kot zanimivost si poglejmo še tretji in četrta nihajna načina. Primeri so prikazani na slikah \ref{fig:slika21}, \ref{fig:slika22}, \ref{fig:slika23}, \ref{fig:slika24} in \ref{fig:slika25}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez4_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez4_1_1.pdf}
+    \end{subfigure}
+    \caption{Tretji lastni nihajni način. Levo za $\rho_1= 0.5$, $\rho_2=5$ in desno za $\rho_1= 5$, $\rho_2=0.5$ pri $N=70$.} \label{fig:slika21}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez3_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez3_2.pdf}
+    \end{subfigure}
+    \caption{Četrti lastni nihajni način za $\rho_1= 0.5$, $\rho_2=5$ pri $N=70$.} \label{fig:slika22}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez3_3.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez3_4.pdf}
+    \end{subfigure}
+    \caption{Linearna kombinacija načinov iz \ref{fig:slika22} $\rho_1= 0.5$, $\rho_2=5$ pri $N=70$.} \label{fig:slika23}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez3_1_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez3_1_2.pdf}
+    \end{subfigure}
+    \caption{Četrti lastni nihajni način za $\rho_1= 5$, $\rho_2=0.5$ pri $N=70$.} \label{fig:slika24}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez3_1_3.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{obtez3_1_4.pdf}
+    \end{subfigure}
+    \caption{Linearna kombinacija načinov iz \ref{fig:slika24} $\rho_1= 5$, $\rho_2=0.5$ pri $N=70$.} \label{fig:slika25}
+\end{figure}
+
+\section*{Nihanje homogene polkrožne opne}
+
+Določiti želimo nekaj lastnih nihajnih časov in lastnih nihajnih načinov homogene polkrožne opne. Rešujemo problem v polarnih koordinatah. Najprej si izberemo razporeditev točk. Razporeditev točk prikazuje slika \ref{fig:slika26}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.3\textwidth]{polkrozna_opna.pdf}
+\caption{Primer razporeditve točk na polkrožni opni za $N$=3.} \label{fig:slika26}
+\end{center}
+\end{figure} 
+
+\noindent Poissonova enačba v polarnih koordinatah se glasi:
+\begin{equation} \label{eq:enacba11}
+\nabla ^{2} u = \frac{\partial^{2} u }{\partial r^{2}} + \frac{1}{r} \frac{\partial u}{\partial r} + \frac{1}{r^{2}} \frac{\partial ^{2} u}{\partial \phi ^{2}}=k^{2} u.
+\end{equation}
+Prevesti jo želimo v diferenčno obliko. Pri tem upoštevamo
+\begin{equation*}
+u(r,\phi) \rightarrow u(x_i, \phi _j) = u_{i,j}, \ \  h_r = r/(N_r+1), \ \ h_{\phi}=\pi /(N_{\phi}+1), \ \  N_{\phi} = N_r=N,
+\end{equation*}
+pri čemer je $N$ število nerobnih točk, in
+\begin{align*}
+& \frac{\partial^{2} u }{\partial r^{2}} = \frac{u_{i-1,j} + u_{i+1,j} - 2u_{i,j} }{h_r ^{2}} \\
+& \frac{1}{r} \frac{\partial u}{\partial r} = \frac{1}{h_r \cdot i} \frac{u_{i+1,j} - u_{i-1,j}}{2 h_r} \\
+& \frac{1}{r^{2}} \frac{\partial ^{2} u}{\partial \phi ^{2}} = \frac{1}{(h_{r} \cdot i)^{2}} \frac{u_{i,j-1} + u_{i,j+1} - 2u_{i,j}}{h_{\phi} ^{2}}
+\end{align*}
+in vstavimo v enačbo  (\ref{eq:enacba11}). Tako dobimo
+\begin{align}
+\nabla ^{2} u & =  u_{i+1,j} \left( \frac{1}{h_r ^{2} } + \frac{1}{2ih_r ^{2}}  \right) \nonumber \\
+& + u_{i,j} \left(  -\frac{2}{h_r ^{2}} - \frac{2}{(h_r \cdot i \cdot h_{\phi} )^{2}}    \right) \nonumber \\
+& + u_{i-1,j} \left( \frac{1}{h_r ^{2} }  - \frac{1}{2i h_r ^{2}} \right) \nonumber \\
+& + \left(u_{i,j-1} + u_{i,j+1}  \right) \frac{1}{h_r ^{2} i ^{2} h_{\phi}^{2} }.
+\end{align}
+Če sedaj zapišemo operator $\nabla ^{2}$ kot matriko $A$:
+\begin{equation}
+A=\begin{bmatrix}
+T & T_1 & 0 & 0\\
+T_2 & T & \ddots & 0\\
+0 & \ddots & \ddots & T_1\\
+0 & 0 & T_2 & T
+\end{bmatrix},
+\end{equation}
+pri čemer so:
+\begin{align*}
+T= \begin{bmatrix}
+\star & \bullet &  & \\
+\bullet & \ddots & \ddots & \\
+ & \ddots & \ddots & \bullet\\
+ &  & \bullet & \star
+\end{bmatrix}, \qquad \star = \frac{2}{h_r ^{2}} + \frac{2}{(h_r \cdot i \cdot h_{\phi} )^{2}}, \qquad \bullet= 1/(h_r i h_{\phi})^{2}
+\end{align*}
+
+\begin{align*}
+T_1 & = \begin{bmatrix}
+\Diamond &  & \\
+ & \ddots  & \\
+ &  &  \Diamond
+\end{bmatrix}, \qquad \Diamond = -\left( \frac{1}{h_r ^{2}} +  \frac{1}{2ih_r^{2}} \right) \\
+T_2 & = \begin{bmatrix}
+\Box &  & \\
+ & \ddots  & \\
+ &  &  \Box
+\end{bmatrix}, \qquad \Box = -\left( \frac{1}{h_r ^{2}} -  \frac{1}{2ih_r^{2}} \right).
+\end{align*}
+Matrika $A$ sedaj ni več simetrična. Tako ne moremo uporabiti istih knjižic kot prej za simetrične matrike. poleg tega reševanje postane počasnejše. Za reševanje bomo tako uporabili knjižico \textsf{scipy.sparse.linalg.eigs}.
+
+Poglejmo si rezultate, ki smo jih izračunali za $N=49$. Načeloma presenečajo vsi rezultati lastnih nihajnih načinov, saj ne dobimo vseh. Najbolj preseneča rezultat za prvo lastno nihanje, prikazan na sliki \ref{fig:slika27}. Vidimo, da rešitev ni čisto simetrična. Poleg tega smo opazili, da se lastna vrednost tega načina zmanjšuje precej več z večanjem števila $N$, kot ostale lastne vrednosti in ni videti, da konvergira h končni vrednosti. Mogoče bi se stvari spremenile če bi število $N$ še povečali.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{polkrozna_opna1_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{polkrozna_opna1_2.pdf}
+    \end{subfigure}
+    \caption{Prvi nihajni način.} \label{fig:slika27}
+\end{figure}
+
+Rešitve za višje lastne nihajne načine zgledajo precej bolj smiselne, vendar še vedno pogrešamo nekatere lastne nihajne načine, ki jih poznamo iz literature. Rešitve za drugo, tretjo, četrto, peto in šesto lastno nihanje so prikazane na slikah \ref{fig:slika28}, \ref{fig:slika29}, \ref{fig:slika30}, \ref{fig:slika31} in \ref{fig:slika32}.
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{polkrozna_opna2_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{polkrozna_opna2_2.pdf}
+    \end{subfigure}
+    \caption{Drugi nihajni način.} \label{fig:slika28}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{polkrozna_opna3_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{polkrozna_opna3_2.pdf}
+    \end{subfigure}
+    \caption{Tretji nihajni način.} \label{fig:slika29}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{polkrozna_opna4_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{polkrozna_opna4_2.pdf}
+    \end{subfigure}
+    \caption{Četrti nihajni način.} \label{fig:slika30}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{polkrozna_opna5_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{polkrozna_opna5_2.pdf}
+    \end{subfigure}
+    \caption{Peti nihajni način.} \label{fig:slika31}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{polkrozna_opna6_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{polkrozna_opna6_2.pdf}
+    \end{subfigure}
+    \caption{Šesti nihajni način.} \label{fig:slika32}
+\end{figure}
+
+Reševali smo v polarnih koordinatah, zanimivo pa bi si bilo ogledati rešitve v kartezičnih koordinatah, kjer bi območje opne obravnavali z gostoto 1 in območje, kjer ni opne z gostoto 0.
+
+\end{document}
