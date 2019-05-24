@@ -1,0 +1,297 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene]{babel}    % naloži, med drugim, slovenske delilne vzorce
+
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{amsmath}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}} %naredi vector kot bold zapis
+
+\usepackage{float}
+
+\usepackage{amssymb}
+
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[slovene]{babel}
+%\usepackage[latin2]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{makeidx}%za stvarno kazalo
+%\makeindex%naredi stvarno kazalo
+%\usepackage{tikz}% paket za kroge
+
+\title{\textbf{Modelska analiza 2} \\ 3. naloga - Lastne energije Schr\"odingerjeve enačbe \\}
+	\author{Študent: Pšeničnik Tomaž}
+	
+	
+
+
+	
+\begin{document}
+
+\pagenumbering{gobble}
+
+	\begin{figure} [h]
+  \centering
+  \includegraphics[width=12 cm]{logo_fmf.png}
+  \maketitle
+\end{figure}
+	
+	
+	
+	\newpage
+	\pagenumbering{arabic}
+	
+	
+	
+\section*{Lastne energije vodikovega atoma}
+
+Rešujemo radialen del Schr\"odingerjeveve enačbe  za vodikov atom, ki se glasi
+\begin{equation}
+\left( - \frac{d^{2}}{dx^{2}}-\frac{2}{x} +\frac{l(l+1)}{x^{2}} \right) R(x)= \varepsilon R(x),
+\end{equation}
+pri čerem je $\Psi(x)= R(x)/x$, $x=r/r_b$, $\epsilon = E/E_0$, $r_b$ je Bohrov radij in $E_0= 13.6 \textrm{eV}$. Postopka se bomo lotili z metodo Numerova, ki jo priporočajo za ta tip problemov.
+
+Metoda Numerova je način reševanja enačb tipa 
+\begin{equation} \label{eq:1}
+\left[\frac{d^{2}}{dx^{2}}+k^{2} \right] y(x)=0
+\end{equation}
+s pomočjo formule
+\begin{equation} \label{eq:2}
+y_{i+1} = \frac{2\left(1- \frac{5h^{2}}{12}k_i ^{2}\right) y_i - \left(1 + \frac{h^{2}}{12}k_{i-1} ^{2} \right)y_{i-1}}{1+\frac{h^{2}}{12}k_{i+1}^{2}},
+\end{equation}
+kjer je $h$ korak med sosednjima točkama.
+
+Želimo priti do formule (\ref{eq:2}). To storimo tako, da diskretiziramo funkcijo $y(x) \rightarrow y_i(x_i)$ , kjer je interval med dvema sosednjima točkama $h$. Enačba (\ref{eq:1}) se glasi
+\begin{equation}
+ y_i '' + k_i^{2}(x_i)y_i=0
+\end{equation}
+za vse $i$. Potrebujemo diskretno zvezo drugega odvoda. Dobimo jo s pomočjo \textit{Taylorjeve} \textit{vrste}:
+\begin{equation} \label{eq:3}
+y(x+h)= y(x) +h y'(x) + \frac{h^{2}}{2}y'' (x) + \frac{h^{3}}{6}y'''(x) + \frac{h^{4}}{24} y''''(x) +\dots
+\end{equation}
+in podobno še
+\begin{equation} \label{eq:4}
+y(x-h)=y(x) -h y'(x) + \frac{h^{2}}{2}y'' (x) - \frac{h^{3}}{6}y'''(x) + \frac{h^{4}}{24} y''''(x) -\dots
+\end{equation}
+Seštejemo enačbi (\ref{eq:3}) in (\ref{eq:4}) in dobimo:
+\begin{equation} \label{eq:5}
+y(x+h) + y(x-h)= 2y + h^{2}y'' + \frac{h^{4}}{12}y'''' + \mathcal{O}(h^{6}).
+\end{equation}
+Z uporabo diskretne notacije enačbo (\ref{eq:5}) malenkost preuredimo, da dobimo
+\begin{equation} \label{eq:8}
+y_i'' = \frac{y_{i+1} + y_{i-1} -2y_i}{h^{2}} - \frac{h^{2}}{12}y_i '''' - \mathcal{O}(h^{4}).
+\end{equation}
+Upoštevamo $y_i ''= -k^{2}_i y_i$. Upoštevamo, da se zveza za trotočkovni centralni odvod (three point central difference formula) glasi:
+\begin{equation}
+ y_i '' = \frac{y_{i+1}+ y_{i-1} -2y_i}{h^{2}} + \mathcal{O}(h^{2}), \nonumber
+\end{equation}
+ki jo uporabimo pri  slednji zvezi
+\begin{equation}
+y '''' = -\frac{d^{2}}{dx^{2}}(k^{2}y) \rightarrow y_i '''' = -\frac{1}{h^{2}}[k^{2}_{i+1}y_{i+1} + k^{2} _{i-1}y_{i-1} - 2k^{2}_i y_i]+ \mathcal{O}(h^{2}).
+\end{equation}
+Obe dobljeni zvezi vstavimo v enačbo \ref{eq:8} ter preuredimo člene in dobimo željeno zvezo (\ref{eq:2}).
+
+
+Da lahko zvezo (\ref{eq:2}) uspešno uporabimo moramo podati prvi dve začetni točki. Zavedati se moramo, da prva začetna točka ne more biti $x_0=0$, lahko pa za začetni točki uporabimo $y_1(x=h)$ in $y_2(x=2h)$. Točki dobimo s pomočjo nastavka
+\begin{equation}
+y(x)=a_1 x +a_2 x^{2} + a_3 x^{3} + \dots  \ \ , \nonumber
+\end{equation}
+ki ga vstavimo v začetno enačbo (\ref{eq:1}). Tako dobimo
+\begin{equation}
+2a_2 + 6a_3 x + 12 a_4 x^{2} + \dots =\left(-\frac{2}{x} + \frac{l(l+1)}{x^{2}} -\epsilon\right)\cdot (a_1 x + a_2 x^{2} + \dots).
+\end{equation}
+Enačimo člene in dobimo zveze za iskane koeficiente $a_1, \ \ a_2, \ \ \dots$ Koeficienti za različne $l$ se glasijo:
+\begin{itemize}
+\item[l=0]: $a_0=0, \ \ a_1 = 1, \ \ a_2 = -1, \ \ a_3 = \frac{1}{6}(2-\epsilon), \ \ a_4= \frac{1}{18}(-1 +2e) , \ \ a_5 = \frac{1}{360}(2-10\epsilon + 3 \epsilon ^{2}$
+\item[l=1]: $a_0=a_1=0, \ \ a_2=1, \ \ a_3 = -\frac{1}{2}, \ \ a_4= \frac{1}{10}(1-\epsilon), \ \ a_5 = \frac{1}{180}(-2+7 \epsilon$
+\item[l=2]: $a_0=a_1=a_2=0, \ \ a_3=1, \ \ a_4 =-\frac{1}{3}, \ a_5 = \frac{1}{42}(2-e\epsilon), \ \ a_6= \frac{1}{252}(-1 +5 \epsilon)$
+\end{itemize}
+Izkaže se, da je glede natančnosti (ubistvu kasneje stvari začnejo divergirati) bolje vzeti za izračun prvih dveh točk več koeficientov, kot le prva dva neničelna, ki sta neodvisna od energije in tirne vrtilne količine.
+
+Sledeča naloga je najti lastne energije našega sistema. Opazimo, da stvari slej ko prej divergirajo. Opazimo, da se pri prehodu preko lastne energije, predznak divergiranja spremeni, kar lahko s pridom izkoristimo in z metodo bisekcije približno določimo lastne energije. Na srečo vemo, da lastne energije vodikovega atmoma niso odvisne od tirne vrtline količine, zato lahko poiščemo lastne energije za primer $l=0$.
+Metoda bisekcije je prikazana na sliki \ref{fig:slika1}.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{schr_eigenvalues_2.png}
+    \caption{Uporaba bisekcije za določitev lastnih energij. Pogoj za divergenco smo smo podali kot $y_i > 100$.} \label{fig:slika1}
+\end{figure}
+\noindent V tabeli si poglejmo dobljene lastne energije. Energije se precej dobro ujemajo z analitičnimi $\frac{1}{n^{2}}$.
+
+\begin{table}[H]
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+n & $\epsilon_0$    & $\epsilon$ \\ \hline
+1 & -1              & -1.005     \\ \hline
+2 & -0.25           & -0.2474    \\ \hline
+3 & -0.11$\bar{1}$  & -0.1125    \\ \hline
+4 & -0.0625         & -0.063     \\ \hline
+5 & -0.04           & -0.04094   \\ \hline
+6 & -0.027$\bar{7}$ & -0.02699   \\ \hline
+7 & -0.0204         & -0.0209    \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+Stvari ne pričnejo divergirati pri istem $x$, temveč višja, kot je lastna energija, večji je tudi $x$ divergiranja. Slika \ref{fig:slika2} prikazuje ravno $x$ divergence v odvisnosti od lastne energije. Divergiranje smo pričeli gledati pri zahtevi $y_i > 100$ .
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{schr_eigenvalues_2_pot.png}
+    \caption{$x$ divergiranja v odvisnosti od energije.} \label{fig:slika2}
+\end{figure}
+
+Sedaj si lahko pogledamo, kako se radialne funkcije ujemajo z analitičnimi. Za izračun funkcij bomo uporabili že izračunane koeficiente in uporabili energije v tabeli.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{radialne_valovne_funkcije_0.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{radialne_valovne_funkcije_1.png}
+    \end{subfigure}
+    \caption{Primerjava z analitično rešitvijo $R_{10}=xe^{-x}$.} \label{fig:slika3}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{radialne_valovne_funkcije_2.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{radialne_valovne_funkcije_3.png}
+    \end{subfigure}
+    \caption{Primerjava z analitično rešitvijo $R_{20}=x(1-\frac{1}{2}x)e^{-x/2}$.} \label{fig:slika4}
+\end{figure}
+
+Kot vidimo na slikah \ref{fig:slika3} in \ref{fig:slika4}, so odstopanja radialnih funkcij z izračunanima lastnima energijama precej velika, kljub temu da smo dokaj natančno izračunali lastne energije. Za uporabo metode \textit{Numerova} bi bilo potrebno natančneje poračunati lastne energije.
+
+Poglejmo si še nekaj funkcij z $l=0$. Radialne valovne funkcije so prikazane na sliki \ref{fig:slika5}. Dobili smo jih s pomočjo metode \textit{Numerova}. Pomembno je, da podamo lastne energije zelo natančno. Npr. pri radialni valovni funkciji $R_{30}$ smo podali lastno energijo na 8 decimalnih mest natančno, da stvar še konvergira pri $x=70$, drugače bi prišlo do divergiranja že prej.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{nekaj_radialnih_funkcij.png}
+    \caption{Radialne valovne funkcije $R_{i0}$.} \label{fig:slika5}
+\end{figure}
+
+
+\section*{Propagacija monokromatske svetlobe}
+
+Obravnavamo propagacijo monokromatske svetlobe v snovi, za katero velja Helmholtzova enačba, ki se v brezdimenzijski obliki glasi
+\begin{equation}
+(\nabla ^{2} + n(\vec{r})^{2} k^{2}) \Psi(\vec{r})=0. \nonumber
+\end{equation}
+Pri tem je $n(\vec{r})$ lomni količnik, $k$ pa brezdimenzijkso valovno število. Pri iskanju lastnih načinov valovanja v svetlobnih vlaknih uporabimo nastavek $\Psi(x)= (R(x)/\sqrt{x})e^{i\lambda z}$. Za radialno simetrična stanja dobimo enačbo
+\begin{equation}
+\left[ \frac{d^{2}}{dx^{2}} + \frac{1}{4x^{2}}+ n(x) ^{2} k^{2} -\lambda ^{2} \right] R(x)=0.
+\end{equation}
+Enačbo rešujemo podobno kot prej (z metodo \textit{Numerova}), pri tem pa upoštevamo profil lomnega količnika
+\begin{equation}
+n(x)= \begin{cases} 
+      2 - \frac{1}{2}x^{2} & x < 1 \\
+      1 &  x\geq 1 \\
+   \end{cases}.
+\end{equation}
+
+Profil lomnega količnika prikazuje slika \ref{fig:slika6}.
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.5\textwidth]{lomni_kolicnik.png}
+    \caption{Profil lomnega količnika} \label{fig:slika6}
+\end{figure}
+
+Reševanje problema se lotimo ponovno z ustreznim nastavkom. Uporabimo nastavek za funkcijo $R(x)$
+\begin{equation}
+R(x)= \sqrt{x}(a_0 + a_1 x + a_2 x^{2} + a_3 x^{3} + \dots)
+\end{equation}
+Ponovno izenačimo koeficiente in dobimo za rešitev
+\begin{align*}
+& a_1 = a_3 = \dots= a_{2n+1}=0 \\
+& a_0 =1, \ \ a_2 = \frac{1}{4}(\lambda^{2} - 4k^{2}) , \ \ a_4 = \frac{1}{64}(8k^{2} + 16 k^{4} - 8k^{2} \lambda^{2} + \lambda ^{4}).
+\end{align*}
+Tako dobimo začetni približek za $R(h)$ in $R(2h)$. Podobno iščemo lastne funkcije, kot smo to počeli za primer vodikovega atoma. Fiksiramo $k$ in iščemo lastno vrednost $\lambda$. Izkaže se, da moramo iskati takšne $\lambda$, da bo veljalo $k^{2} -\lambda^{2} <0$, v nasprotnem primeru gre za nevezano stanje in za rešitev dobimo oscilacije. Nekaj primerov oscilacij je prikazanih na sliki \ref{fig:slika7}. 
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{propagacija_svetlobe_1.png}
+    \caption{Nevezane rešitve.} \label{fig:slika7}
+\end{figure}
+
+\noindent Sedaj iščemo lastne vrednosti. Fiksiramo $k$ in zagotovimo, da je $k^{2} < \lambda^{2}$. Za različne fiksirane $k$ dobimo različne lastne vrednosti. Za $k=2$ eno lastno vrednost, $k=5$ tri lastne vrednosti in $k=10$ pet lastnih vrednosti.
+
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{propagacija_svetlobe_0_0.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{propagacija_svetlobe_0_1.png}
+    \end{subfigure}
+    \caption{Fiksiran $k=2$} \label{fig:slika8}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{propagacija_svetlobe_2_0.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{propagacija_svetlobe_2_1.png}
+    \end{subfigure}
+    \caption{Fiksiran $k=5$} \label{fig:slika9}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{propagacija_svetlobe_3_0.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{propagacija_svetlobe_3_1.png}
+    \end{subfigure}
+    \caption{Fiksiran $k=10$} \label{fig:slika10}
+\end{figure}
+
+\noindent Rezultati lastnih vrednosti za prikazane primere se nahajajo v spodnji tabeli. 
+\begin{table}[H]
+\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
+\hline
+k         & 2     & \multicolumn{3}{c|}{5} & \multicolumn{5}{c|}{10}                    \\ \hline
+$\lambda$ & 3.232 & 5.331  & 7.641 & 9.281 & 11.811 & 14.347 & 16.219 & 17.806 & 19.289 \\ \hline
+\end{tabular}
+\end{table}
+
+S dobljenimi $\lambda$ lahko narišemo nekaj funkcij $R(x)$. Rezultati za $\lambda=2$ in $\lambda=5$ so prikazani na sliki \ref{fig:slika11}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{svetloba_primeri_0_1.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{svetloba_primeri_0_2.png}
+    \end{subfigure}
+    \caption{Rezultati za $\lambda=2$ in $\lambda=5$. } \label{fig:slika11}
+\end{figure}
+
+Za konec si poglejmo disperzijsko relacijo $\lambda (k)$, kjer pričakujemo eno lastno vrednost na začetku in pet lastnih vrednosti na koncu, vmes pa razcepe, ki ne vemo kakšni so. Na sliki \ref{fig:slika12} so prikazane $\lambda (k)$ za $k \in [0.8,10]$. Vidimo, da so disperzijske relacije praktično linearno odvisne.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{disperzija.png}
+    \caption{$\lambda (k)$} \label{fig:slika12}
+\end{figure}
+
+\end{document}
