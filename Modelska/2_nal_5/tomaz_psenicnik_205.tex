@@ -1,0 +1,325 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene]{babel}    % naloži, med drugim, slovenske delilne vzorce
+
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{amsmath}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}} %naredi vector kot bold zapis
+
+\usepackage{float}
+
+\usepackage{amssymb}
+
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[slovene]{babel}
+%\usepackage[latin2]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{makeidx}%za stvarno kazalo
+%\makeindex%naredi stvarno kazalo
+%\usepackage{tikz}% paket za kroge
+
+\title{\textbf{Modelska analiza 2} \\ 5. naloga - Parcialne diferencialne enačbe: robni problemi in relaksacija \\}
+	\author{Študent: Pšeničnik Tomaž}
+	
+	
+
+
+	
+\begin{document}
+
+\pagenumbering{gobble}
+
+	\begin{figure} [h]
+  \centering
+  \includegraphics[width=12 cm]{logo_fmf.png}
+  \maketitle
+\end{figure}
+	
+	
+	
+	\newpage
+	\pagenumbering{arabic}
+	
+	
+	
+\section*{Pretok viskozne tekočine po cevi}
+
+Z metodo pospešene relaksacije (SOR - Successive Over-Relaxation) želimo določiti Poiseuillov koeficient za pretok viskozne tekočine po cevi z obliko preseka, podano na sliki \ref{fig:slika1}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.3\textwidth]{lik.pdf}
+\caption{Cev z danim prerezom} \label{fig:slika1}
+\end{center}
+\end{figure} 
+
+\noindent Najprej si poglejmo, kaj je Poiseuillov koeficient za pretok nestisljive viskozne tekočine po cevi z nekim presekom. Po predpostavki o stacionarnem toku in gabanju le v eni smeri, recimo v smeri $z$, lahko našo enačbo gibanja zapišemo kot:
+\begin{equation} \label{eq:enacba1}
+-\eta \nabla ^{2} u = \frac{dp}{dz} \approx \frac{\Delta p}{ \Delta z},
+\end{equation}
+kjer je $\eta$ koeficient viskoznosti, $u$ hitrost tekočine v točki $(x,y)$ v smeri $z$ in $dp/dz$ gradient tlaka v smeri toka tekočine ($z$). po preureditvi enačbe (\ref{eq:enacba1}) dobimo Poissonovo enačbo
+\begin{equation} \label{eq:enacba2}
+-\nabla ^{2} u = q, \qquad q = \frac{1}{\eta}\frac{\Delta p}{\Delta z},
+\end{equation} 
+z zahtevo, da je na robu cevi $\partial R$ hitrost tekočine enaka nič $u=0$. Poiseuillov koeficient je za poljuben presek definiran kot razmerje volumskega pretoka za okroglo cev
+\begin{equation}
+C= \frac{\Phi_V}{\Phi_V ^{0}}, \qquad \Phi_V ^{0}= \frac{q S^{2}}{8 \pi},
+\end{equation}
+kjer je volumski pretok definiran kot
+\begin{equation}
+\Phi _V = \int _S u dS = C\frac{S^{2}q}{8 \pi}.
+\end{equation}
+
+Metoda pospešene relaksacije je iterativna metoda, pri kateri uporabimo Jacobijev ali Gauss-Seidlov postopek tako, da skalira iteracijski faktor $0 <\omega<2$:
+\begin{equation*}
+u_{j,k} ^{n+1} = u_{j,k} ^{n} + \omega \left( \tilde{u}_{j,k} ^{n} - u_{j,k} ^{n}  \right),
+\end{equation*}
+kjer je $\tilde{u_{j,k}}^{n}$ vmesni izračun Jacobijeve ali Gauss-Seidlove iteracije. Uporabili smo zapis 
+\begin{equation*}
+u_{j,k}=u(x_j,y_k).
+\end{equation*}
+Za naslednji korak moramo upoštevati še diferenčni zapis enačbe (\ref{eq:enacba2}). V primeru enako velikih korakov $h$ v vseh smereh, se ta glasi:
+\begin{equation} \label{eq:enacba5}
+\nabla ^{2} u= \frac{\partial ^{2} u }{\partial x^{2}} + \frac{\partial ^{2} u }{\partial x^{y}} = \frac{u_{j-1,k}+ u_{j+1,k} + u _{j,k-1} + u_{j,k+1} - 4u_{j,k} }{h^{2}}=Q_{j,k}.
+\end{equation}
+Iteraciji sta sledeči
+\begin{itemize}
+\item Jacobijeva: \\
+\begin{equation} \label{eq:enacba6}
+\tilde{u}_{j,k} ^{n}= u_{j,k} ^{n+1}= \frac{1}{d}\left[Q_{j,k} + \frac{u_{j+1,k}^{n} + u_{j-1,k}^{n}}{(\Delta x)^{2}} + \frac{u_{j,k+1}^{n} + u_{j,k-1}^{n}}{(\Delta y)^{2}} \right],
+\end{equation}
+\item Gauss-Seidel:\\
+\begin{equation}
+\tilde{u}_{j,k} ^{n}= u_{j,k} ^{n+1}= \frac{1}{d}\left[Q_{j,k} + \frac{u_{j+1,k}^{n} + u_{j-1,k}^{n+1}}{(\Delta x)^{2}} + \frac{u_{j,k+1}^{n} + u_{j,k-1}^{n+1}}{(\Delta y)^{2}} \right],
+\end{equation}
+\end{itemize}
+pri čemer je
+\begin{align*}
+d= 2 \left( \frac{1}{(\Delta x)^{2}} +\frac{1}{(\Delta y)^{2}} \right).
+\end{align*}
+Optimalna izbira faktorja pospešitve $\omega$ je odvisna od spektralnega radija iteracijske matrike  $\rho_{jacobi}$, ki je 
+\begin{equation}
+ \rho_{jacobi}= \frac{2}{d}\left(\frac{1}{(\Delta x)^{2}}\cos \frac{\pi}{N_x}  +\frac{1}{(\Delta y)^{2}}\cos \frac{\pi}{N_y}     \right) \approx 1- \frac{\pi ^{2}}{2N^{2}},
+\end{equation}
+Pri čemer je v našem primeru $N_x = N_y >>1$. Optimalna izbira faktorja $\omega$ za poln kvadrat se potem zapiše kot
+\begin{equation} \label{eq:enacba10}
+\omega=\frac{2}{1+\sqrt{1- \rho_{Jacobi}^{2}}} \qquad \textrm{ali približno} \qquad \omega= \frac{2}{1+\frac{\pi}{N}}.
+\end{equation}
+Za bolj splošno obliko dobimo boljšo oceno z nastavkom
+\begin{equation}
+\omega = \frac{2}{1+ \alpha \frac{\pi}{N}}.
+\end{equation} \newpage
+
+Za začetek si poglejmo metodo delovanja na polnem kvadratu (101x101) in trikotniku (201x201). Uporabljena metoda je bila Jacobijeva, pri čemer smo vzeli konstanten $Q_{j,k}$, in sicer:
+\begin{equation*}
+Q_{j,k}=-q , \qquad q=\frac{1}{\eta} \frac{\Delta p}{\Delta z},
+\end{equation*}
+pri čemer smo vzeli brezdimenzijsko viskoznost $\eta \approx 1$ za vodo pri 20°C in brezdimenzijski gradient tlaka $\Delta p / \Delta z = -0.28$.
+Pomembno je, da z metodo delujemo le na območju, kjer smo na začetku definirali enice. Rezultati za kvadrat so prikazani na slikah \ref{fig:slika3}, začetni pogoji pa \ref{fig:slika2}. Rezultati za trikotnik so predstavljeni na slikah \ref{fig:slika5}, začetni pogoji na sliki \ref{fig:slika4}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{2d_simpson_0.png}
+\caption{Hitrostno polje pretoka $u$ pred začetkom postopka.} \label{fig:slika2}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{2d_simpson_1.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{2d_simpson_2.png}
+    \end{subfigure}
+    \caption{Hitrostno polje pretoka $u$ po končani iteraciji.} \label{fig:slika3}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.45\textwidth]{trikotnik_jacobi_0.png}
+\caption{Hitrostno polje pretoka $u$ pred začetkom postopka.} \label{fig:slika4}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{trikotnik_jacobi_1.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}
+        \includegraphics[width=\textwidth]{trikotnik_jacobi_2.png}
+    \end{subfigure}
+    \caption{Hitrostno polje pretoka $u$ po končani iteraciji.} \label{fig:slika5}
+\end{figure}
+
+\noindent Prepričani v dobro delujočo metodo, si poglejmo hitrostno polje pretoka $u$ po izbrani cevi \ref{fig:slika1}. Rešitve in začetne pogoje prikazujejo slike \ref{fig:slika6},  \ref{fig:slika7} in \ref{fig:slika8}. Uporabili smo $N=101$.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.45\textwidth]{lik_jacobi_0.png}
+\caption{Hitrostno polje pretoka $u$ pred začetkom postopka.} \label{fig:slika6}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{lik_jacobi_1.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{lik_jacobi_2.png}
+    \end{subfigure}
+    \caption{Hitrostno polje pretoka $u$ po končani iteraciji.} \label{fig:slika7}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=\textwidth]{Figure_4.pdf}
+\caption{Hitrostno polje $u$ pretoka .} \label{fig:slika8}
+\end{center}
+\end{figure}
+
+\noindent Poskusili smo tudi metodo \textit{Gauss-Seidel}, če je konvergenca boljša. Za naš primer pri 101x101 veliki matriki, se izkaže, da sta si metodi enakovredni, pri iskanju rešitve z isto natančnostjo. Metoda \textit{Gauss-Seidel} je bila le za en iterativen korak boljša od metode \textit{Jacobija}.
+
+Sedaj je smiselno poiskati optimalen parameter $\omega$ oz. $\alpha$, ki nastopa v enačbi (\ref{eq:enacba10}). Najprej si poglejmo, kakšen je najbolj smiselen parameter za $N=101$. Število iteracij v odvisnosti od $\omega$ prikazuje slika \ref{fig:slika9}, iz katere razberemo, da je optimalna $\omega_{opt.}=1.85$. Vidimo tudi manjše skoke od $\omega>1.8$. Domnevamo, da je razlog za te skoke premajhno izbrano število $N$.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{omega1.png}
+\caption{Število iteracij v odvisnosti od $\omega$ za $N=101$.} \label{fig:slika9}
+\end{center}
+\end{figure}
+\noindent Porodi se vprašanje, če je $\omega_{opt.}(N)$? Ugotovimo, da je. Rezultate prikazuje slednja slika \ref{fig:slika10}. Iz slike razberemo, da je $\omega_{opt.}$ manjša za manjše $N$, kot za večje.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.5\textwidth]{omega.png}
+\caption{Število iteracij v odvisnosti od $\omega$ pri različnih $N$.} \label{fig:slika10}
+\end{center}
+\end{figure}
+
+Imamo vse sestavine da efektivno poiščemo \textit{Poiseuillov} koeficient za primer $N=101$. Za iskanje smo uporabili $\omega_{opt.}=1.85$. Pretok smo izračunali s pomočjo 2D Simpsonove metode, ki je:
+\begin{equation}
+\int \int u(x,y) dS \approx \sum _{j,k} W_{j,k} u_{j,k} /N^{2},
+\end{equation}
+pri čemer je $W$ matrika, kjer imamo za primer 5x5 matriko:
+\begin{equation*}
+\begin{bmatrix}
+1 & 4 & 2 & 4 & 1 \\
+4 & 16 & 8 & 16 & 4 \\
+2 & 8 & 4 & 8 & 2 \\
+4 & 16 & 8 & 16 & 4 \\
+1 & 4 & 2 & 4 & 1 
+\end{bmatrix}.
+\end{equation*} 
+Tako z izračuno pretoka izrazimo koeficient $C=1.4165$:
+\begin{equation*}
+C=\Phi _{V}\frac{8 \pi}{S^{2}}\eta \frac{\Delta z}{\Delta p}, \qquad S= 10/16, \qquad \frac{1}{\eta} \frac{\Delta p}{\Delta z}=0.28.
+\end{equation*}
+Rezultate prikazujeta sliki \ref{fig:slika11}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{poiseuill_1.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{poiseuill_2.png}
+    \end{subfigure}
+    \caption{\textit{Poiseuillov} koeficient za primer $N=101$.} \label{fig:slika11}
+\end{figure}
+
+\noindent Z večanjem števila $N$, bi tudi povečali koeficient, saj bi s tem zapolnili vedno več praznega prostora, ki ga z mnajšimi $N$ nismo mogli. To povečanje ni veliko in bi se v primeru $N=201$ poznalo šele na drugi ali tretji decimalki. Z dodatnim večanjem bi se pričele spreminjati decimalke na višjh številih.
+
+\section*{Temperaturni profil valja}
+
+Imamo enakostraničen kovinski valj ($2r=H$), ki ga grejemo na spodnji ploskvi s konstantnim toplotnim tokom, plašč prerežemo horizontalno na dve enako široki polovici pri različnih temperaturah, zgornjo ploskev pa držimo na isti temperaturi, kot spodnjo polovico plašča. Določiti želimo temperaturni profil.
+
+Reševanje se v tem primeru ne spremeni veliko. Iz kartezičnih koordinat preidemo v cilindrične. Za temperaturni profil v stacionarnem stanju velja \textit{Laplace-ova} enačba
+\begin{equation*}
+\nabla ^{2} u=0,
+\end{equation*}
+toda izpeljali bomo za bolj splošno \textit{Poisson-ovo} enačbo
+\begin{equation*}
+\nabla ^{2} u=-q.
+\end{equation*}
+\textit{Poisson-ova} enačba se v cilindričnih koordinatah glasi:
+\begin{equation}
+\nabla ^{2} u=  \frac{\partial ^{2} u}{ \partial r^{2}} + \frac{1}{r} \frac{\partial u}{\partial r} + 
+\frac{1}{r^{2}}\frac{\partial ^{2} u}{\partial \theta ^{2}} + \frac{\partial ^{2} u}{\partial z^{2}}=-q,
+\end{equation} 
+pri čemer so:
+\begin{align}
+& \frac{\partial ^{2} u}{\partial r^{2}} =\frac{u_{j,k-1} - 2 u_{j,k} + u_{j,k+1}}{h^{2}}, \\
+& \frac{\partial ^{2} u}{ \partial z^{2}} =  \frac{u_{j-1,k} - 2 u_{j,k} + u_{j+1,k}}{h^{2}}, \\
+& \frac{1}{r} \frac{\partial u}{\partial r} =  \frac{1}{r_j} \frac{u_{j,k+1} - u_{j,k-1}}{2h}, \\
+& \frac{1}{r^{2}}\frac{\partial ^{2} u}{\partial \theta ^{2}}= 0.
+\end{align}
+Če sedaj delujemo po zgledu enačb (\ref{eq:enacba5}) in (\ref{eq:enacba6}), upoštevanjem $h= \Delta x = \Delta y$ in $d=4/h^{2}$, dobimo \textit{Jacobi-jevo} iteracijsko shemo za cilindrične koordinate
+\begin{align} \label{eq:enacba17}
+\tilde{u}^{n}_{j,k}=u^{n+1}_{j,k}= \frac{1}{d} &\left[ Q_{j,k} \right. \nonumber \\
++& \frac{u_{j-1,k}^{n} + u_{j+1,k}^{n} + u_{j,k-1}^{n}  + u_{j,k+1}^{n} }{h^{2}} \nonumber \\
++ &\left.  \frac{1}{r_k} \frac{u_{j,k+1}^{n} - u_{j,k-1}^{n}}{2h} \right].
+\end{align}
+V splošnem rešujemo problem na enak način kot prej
+\begin{equation*}
+u_{j,k} ^{n+1} = u_{j,k} ^{n} + \omega \left( \tilde{u}_{j,k} ^{n} - u_{j,k} ^{n}  \right).
+\end{equation*}
+
+V enačbi (\ref{eq:enacba17}) nastopa člen $1/r_j$, ki povzroča težave, saj je singularen v točki 0. Problema se rešimo tako, da definiramo $r_j$ izmaknjen iz ihodišča:
+\begin{align*}
+r_k= -1+ h\left( j + 1/2 \right), \qquad j=0,1,2, ...   N-1
+\end{align*}
+Ker je reševanje simetrično glede na $r$, se bomo poslužili trika in problem reševali s pomočjo zrcaljenja. Tako bomo za vsak $r_j$ zapisali še $r_{-j}$ in dobili $2N$ enakomerno razporejenih točk. Robne pogoje bomo uporabili enake na $r_{-N}=r_{N}$.  V $z$ smeri je stvar trivialna. $z$ razdelimo na $2N$ točk.
+
+Robne pogoje za konstantno temperaturo poznamo. Spremenijo pa se robni pogoji, pri katerih imamo konstanten odvod (konstanten toplotni tok $\rightarrow$ grelec na dnu valja ali izoliran rob).
+Tako imamo pogoje glede na rob:
+\begin{align} \label{eq:enacba18}
+& \frac{\partial u}{\partial r}\biggr|_{\partial R} = \frac{u_{j,k+1} - u_{j,k-1}}{2h} = K_1 \nonumber \\
+& \rightarrow u_{j,k+1}= 2hK_1 + u_{j,k-1} \qquad \textrm{ali} \qquad u_{j,k-1}= u_{j,k+1} -2hK_1
+\end{align}
+in
+\begin{align} \label{eq:enacba19}
+& \frac{\partial u}{\partial z}\biggr|_{\partial R} = \frac{u_{j+1,k} - u_{j-1,k}}{2h} = K_2 \nonumber \\
+& \rightarrow u_{j+1,k}= 2hK_2 + u_{j-1,k} \qquad \textrm{ali} \qquad u_{j-1,k}= u_{j+1,k} -2hK_2
+\end{align}
+Enačbi (\ref{eq:enacba18}) in (\ref{eq:enacba19}) vstavimo v \textit{Jacobi-jevo} iteracijsko shemo (\ref{eq:enacba17}) glede na zahtevan robni pogoj in dobimo iteracijsko shemo za rob našega iskanega območja. Povsod drugje uporabimo originalno enačbo (\ref{eq:enacba17}).
+
+Imamo vse sestavine, da si pogledamo iskani problem. Za začetek si poglejmo primer, kjer grejemo spodnjo ploskev s konstantnim toplotnim tokom. To nam da robni problem za enačbo (\ref{eq:enacba19}), kjer določimo koeficient $K_1=0.5$. Ostali robovi so na konstantni temperaturi 0 ali 2. Rešitev prikazuje slika \ref{fig:slika12}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.65\textwidth]{valj3.png}
+\caption{Rešitev 1.} \label{fig:slika12}
+\end{center}
+\end{figure}
+
+\noindent Naloga zahteva, da si pogledamo še primer, kjer zgornja polovica plašča nima več konstantne temperature, temveč je izolirana. Robni pogoj poiščemo iz enačbe (\ref{eq:enacba18}), kjer velja za izoliran rob $K_1=0$. Ostali pogoji so ostali enaki. Rešitev je prikazana na sliki \ref{fig:slika13}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.65\textwidth]{valj4.png}
+\caption{Rešitev 2.} \label{fig:slika13}
+\end{center}
+\end{figure}
+
+Kot dodatek si poglejmo še, kako je, če odvajamo toploto $\rightarrow$ spremenimo $K_2=-0.5$. Še vedno imamo izoliran zgornji plašč, ostale robove držimo na temperaturi 2. Rešitev je prikazana na sliki \ref{fig:slika14}.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.65\textwidth]{valj5.png}
+\caption{Rešitev 3.} \label{fig:slika14}
+\end{center}
+\end{figure}
+
+
+\end{document}
