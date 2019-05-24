@@ -1,0 +1,310 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene]{babel}    % naloži, med drugim, slovenske delilne vzorce
+
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{amsmath}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}} %naredi vector kot bold zapis
+
+\usepackage{float}
+
+\usepackage{amssymb}
+
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[slovene]{babel}
+%\usepackage[latin2]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{makeidx}%za stvarno kazalo
+%\makeindex%naredi stvarno kazalo
+%\usepackage{tikz}% paket za kroge
+
+\title{\textbf{Modelska analiza 2} \\ 4. naloga - Hartree-Fockova metoda \\}
+	\author{Študent: Pšeničnik Tomaž}
+	
+	
+
+
+	
+\begin{document}
+
+\pagenumbering{gobble}
+
+	\begin{figure} [h]
+  \centering
+  \includegraphics[width=12 cm]{logo_fmf.png}
+  \maketitle
+\end{figure}
+	
+	
+	
+	\newpage
+	\pagenumbering{arabic}
+	
+	
+	
+\section*{Helijev atom}
+
+
+
+
+Energija enega prostega elektrona v Coulombskem potencialu jedra z nabojem $Z$ se glasi
+\begin{equation*}
+E=\int _0 ^{\infty}  \psi \left[ -\frac{-\hbar ^{2}}{2m} \nabla ^{2}  - \frac{Ze^{2}}{4\pi \epsilon_0}\right] \psi 4\pi r^{2}dr,,
+\end{equation*}
+kjer je v oglatem oklepaju hamiltonian $H$.
+Uporabimo nastavek za valovno funkcijo $\psi(r)=\frac{1}{4\pi} \frac{R(r)}{r}$
+\begin{equation*}
+E= \int _0 ^{\infty} \left[ -\frac{-\hbar ^{2}}{2m}\frac{R''}{r} \cdot \frac{R}{r} - \frac{Ze^{2}}{4\pi \epsilon_0} \right] 4\pi r^{2} dr,
+\end{equation*}
+uporabimo per partes za kinetični del hamiltoniana in dobimo
+\begin{equation*}
+E= -\frac{-\hbar ^{2}}{2m}R\cdot R' \biggr| _0 ^{\infty} + \int _0 ^{\infty} \left( \frac{-\hbar ^{2}}{2m}R'^{2} - \frac{Ze^{2}}{4\pi \epsilon_0}  \frac{R^{2}}{r}\right) dr.
+\end{equation*}
+Ker mora za valovno funkcijo veljati
+\begin{equation*}
+R(0)=R(\infty)=0,
+\end{equation*}
+Dobimo za končno energijo enega elektrona
+\begin{equation} \label{eq:enacba1}
+E=\int _0 ^{\infty} \left( \frac{-\hbar ^{2}}{2m}R'^{2} - \frac{Ze^{2}}{4\pi \epsilon_0}  \frac{R^{2}}{r}\right) dr.
+\end{equation}
+
+Če bi imeli dva neodvisna elektrona, bi bila njuna energija enaka $2E$, ker pa upoštevamo še njun medsebojni odboj $\frac{e_0^{2}}{4\pi \epsilon_0 |r_1 -r_2|}$ in je v hamiltonijanu pozitiven, bo energija dveh elektronov večja od $2E$. Sistem, kjer upoštevamo odboj, pa lahko zapišemo drugače. Rečemo, da je naboj jedra senčen. Senčenje zapakiramo v korelacijsko funkcijo $\Phi$. 
+Z uvedbo spremenljivk $x=r/r_b$, $e=E/E_0$ v enačbi (\ref{eq:enacba1}), upoštevanje dveh elektronov in upoštevanje korelacijske funkcije, dobimo zvezo za energijo dveh elektronov v spremenljivki $x$:
+\begin{equation} \label{eq:enacba2}
+E=2E_0 \int dx \left[ R'(x)^{2} - \frac{2Z}{x}R(x)^{2} -\Phi(x) R^{2}\right] dx.
+\end{equation}
+
+Zapišimo enačbo (\ref{eq:enacba2}) malenkost drugače
+\begin{equation*}
+E=\int \mathcal{L}(x) dx, 
+\end{equation*}
+kjer je $\mathcal{L}$ neke vrste gostota energije po $x$. Enačbo variiramo po valovni funkciji $R(x)$.
+\begin{align*}
+\delta E &= \int dx \left[ \frac{ \partial \mathcal{L}}{\partial R}  \delta R + \frac{\partial \mathcal{L}}{\partial R'} \delta R'\right],
+\end{align*}
+upoštevamo zvezo
+\begin{equation*}
+\frac{\partial}{\partial x} \left( \frac{\partial \mathcal{L}}{ \partial R'}\delta R \right)= \frac{\partial}{\partial x} \left( \frac{\partial \mathcal{L}}{\partial R'} \right) \delta R + \left( \frac{\partial \mathcal{L}}{\partial R'} \right) \frac{\partial}{\partial x} \delta R
+\end{equation*}
+in
+$\delta R' = \frac{d}{dx} \delta R$ in dobimo enačbo za variacijo energije po valovni funkciji $R$:
+\begin{equation}\label{eq:enacba3}
+\delta E= \int_0 ^{\infty} dx \left[  \left( \frac{\partial \mathcal{L}}{\partial R} - \frac{\partial }{\partial x } \frac{\mathcal{L}}{\partial R'} \right) \delta R  + \frac{\partial }{\partial x} \left( \frac{\partial \mathcal{L}}{\partial R'} \delta R \right)\right],
+\end{equation}
+pri čemer zadnji člen izgine, saj moramo imeti na robovih fiksirano funkcijo in velja $\delta R(0) = \delta R(\infty)=0$. To niso nič drugega kot Euler-Lagrangeve enačbe.
+
+V enačbi \ref{eq:enacba2} nastopa potencial enega elektrona $\phi(x)$, ki zadošča Poissonovi enačbi
+\begin{equation*}
+\nabla ^{2} \phi (x)= \frac{R^{2}}{x^{2}}, \qquad \phi = \varphi(x)/x, \qquad \varphi '' (x)= \frac{R^{2}}{x},
+\end{equation*}
+ki jo rešimo z enojno integracijo:
+\begin{equation}\label{eq:enojna_integracija}
+\phi (x)= -\frac{1}{x}\int _0 ^{x} R^{2} (y) dy - \int_x ^{\infty} \frac{R^{2}(y)}{y}dy.
+\end{equation}
+Z dodano omejitvijo $\int _0 ^{\infty} |R^{2}| dx =1$ variiramo malenkost spremenjeno enačbo \ref{eq:enacba2}
+\begin{equation}
+E=E_0 \int dx \left[ R'(x)^{2} - \frac{2Z}{x}R(x)^{2} -\Phi(x) R^{2}\right] dx - 2\mathcal{E}E_0\left( \int R^{2}dx -1\right)
+\end{equation}
+in dobimo
+\begin{equation} \label{eq:iteracija}
+\left[ -\frac{d^{2}}{dx^{2}} - \frac{2Z}{x}- \frac{2\varphi(x)}{x}- \mathcal{E}   \right]R(x)=0.
+\end{equation}
+
+Reševanja problema se lotimo tako, da vzamemo začetni približek za $R(x)$. Poznamo pogoje, da mora biti $R(0)=R(\infty)=0$. Tako za začetni približek vzamemo
+\begin{equation*}
+\alpha x e^{-\lambda x}.
+\end{equation*}
+Funkcija mora biti normirana $\int _0 ^{\infty }R^{2} dx=1$. obimo, da velja $\alpha = 2\lambda ^{3/2}$. Iz tega sledi, da je naš začetni približek enak
+\begin{equation}
+2 (Z^{*}) ^{3/2} x e^{-Z^{*} x},
+\end{equation}
+kjer smo zamenjali le $\lambda \rightarrow Z^{*}$. Iz minimizacije energije (\ref{eq:enacba2}) po $Z^{*}$, nam da za vrednost $Z^{*}= Z- \frac{5}{16}$. Tako imamo prvi približek
+\begin{equation}
+R_0 (x)= 2 \left(Z-\frac{5}{16}\right)^{3/2}e^{-(Z-5/16)x},
+\end{equation}
+ki ga vstavimo v enačbo (\ref{eq:enojna_integracija}) in dobimo $\phi(x)$ in posredno $\varphi(x)$:
+\begin{align*}
+\phi(x)= & e^{-2Z^{*}x} (1- e^{2Z^{*}x} +Z^{*}x)/x, \\
+\varphi(x)= & \phi(x) \cdot x = e^{-2Z^{*}x} (1- e^{2Z^{*}x} +Z^{*}x).
+\end{align*}
+Funkciji sta narisani na sliki \ref{fig:slika1}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{phi.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{varphi.png}
+    \end{subfigure}
+    \caption{Funkciji $\phi(x)$ in $\varphi(x)$.} \label{fig:slika1}
+\end{figure}
+\noindent Kot pričakovano sta funkciji $\phi(x)$ in $\varphi(x)$ negativni, kar v enačbi za energijo (\ref{eq:enacba2}) pomeni, da bomo imeli višjo energijo $E$ (še vedno pričakujemo $E<0$ za vezano stanje).
+
+Z metodo \textit{Numerova} poiščemo lastno energijo $\mathcal{E}$. Za Inicializacijo metode uporabimo enak nastavek kot pri prejšnji nalogi $R(x)=a_1x + a_2 x^{2} + \dots$ in dobimo koeficiente
+\begin{align*}
+a1=1, \qquad a_2= -Z + \varphi, \qquad a_3 = \frac{1}{6}\left( -\mathcal{E}+2\varphi(\varphi +2Z)\right) \\ a_4 = \frac{1}{18}(2\mathcal{E}(\varphi +Z) -\varphi ^{2}(\varphi -3Z))
+\end{align*}
+Praktično bomo uporabili le prvi tri koeficiente, četrtega in višje pa bomo zanemarili. Želimo dobiti le zadosti dober približek prvih dveh točk. Reševanja se lotimo po postopku:
+\begin{itemize}
+\item Začetni približek $R(x)$ vstavimo v enačbo (\ref{eq:enojna_integracija}) in dobimo $\phi(x)$ in $\varphi(x)$.
+\item $\varphi(x)$ vstavimo v enačbo (\ref{eq:iteracija}) in s postopkom \textit{Numerova} dobimo nov približek za $R(x)$.
+\item $R(x)$ renormaliziramo.
+\item Ponavljamo postopek z izboljšanimi približki za $R(x)$, dokler ne dosežemo željene natančnosti
+\item Na koncu rešitev $R(x)$ vstavimo v enačbo (\ref{eq:enacba2}) in dobimo energijo.
+\end{itemize}
+
+Najprej si poglejmo, kakšen je smiselen korak za uporabo \textit{Numerova}, integracije in na splošno v vseh numeričnih postopkih, ki jih bomo uporabili pri nalogi. V prejšnji nalogi smo uporabili korak $h=0.0001$, sumimo pa, da bo za naše potrebe dovolj dober tudi korak $h=0.001$. Za začetek poglejmo, kako kakšna je napaka in kako se ujema analitična funkcija $\phi$ z numerično izračunano. Rezultat je prikazan na sliki \ref{fig:slika2}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{resevanje_1_phi.png}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        \includegraphics[width=\textwidth]{resevanje_1_error.png}
+    \end{subfigure}
+    \caption{Funkcija $\phi(x)$ in napaka med analitično in numerično izračunano funkcijo.} \label{fig:slika2}
+\end{figure}
+\noindent Z uporabljenim korakom $h=0.001$ smo precej zadovolnji in ga bomo skozi nalogo uporabljali. Omenimo še, da bomo za integracijo uporabili \textit{Simpsonovo} metodo, za izračun odvodov pa povprečni odvod v željeni točki
+\begin{equation*}
+f'(x_i)=\frac{f(x_{i+1})-f(x_{i-1})}{2h}.
+\end{equation*}
+
+Sedaj si lahko pogledamo, kako se spreminjajo funkcije $R(x)$ z vsako iteracijo. Rezultat prikazuje slika \ref{fig:slika3}. Vidimo, da dobimo že po prvi iteraciji zelo dober približek končne funkcije $R(x)$. Iteracijo smo končali, ko sta se lastni vrednosti funkcij $R_i$ in $R_{i+1}$ ujemali na 4 decimalna mesta. Kljub dokaj strogi natančnosti, smo potrebovali le 7 iterativnih korakov. Metoda zelo hitro konvergira za dober začetni približek.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.73\textwidth]{resevanje_5_konvergenca.png}
+\caption{Spreminjanje $R(x)$ funkcije z vsako iteracijo. $R_0$ je začetni približek. } \label{fig:slika3}
+\end{center}
+\end{figure}
+
+Pogledali smo si še, kakšne so lastne vrednosti funkcije $R_i$ vse do $i=6$. Lastne vrednosti smo določili s postopkom \textit{Numerova} s pomočjo bisekcije na $10^{-5}$ natančno. Slika \ref{fig:slika4} prikazuje spreminjanje lastnih vrednosti z vsako iteracijo.
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.73\textwidth]{resevanje_5_lastne_vrednosti.png}
+\caption{Lastne vrednosti za funkcije $R_i$. } \label{fig:slika4}
+\end{center}
+\end{figure}
+\noindent Preostane nam le še poračunati energijo. Dobljeno energijo prikazuje tabela \ref{table:tabela1}.
+
+\begin{table}[H] 
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+He       & Račun  & Meritev \\ \hline
+$E$ [eV] & -78.49 & -78.88  \\ \hline
+\end{tabular}
+\end{center}
+\caption{Izračunana energija}
+\label{table:tabela1}
+\end{table}
+
+\section*{Litijev anion (Li$^{+}$)}
+
+Za izračun litijevega aniona uporabimo isto kodo, kot smo računali že za helijev atom. Sprememba je le ta, da za začetni približek vzamemo že znano funkcijo z $Z=3$. Podobno smo analizirali konvergenco, kot pri helijevem atomu. Rezultate prikazujeta sliki \ref{fig:slika5} in \ref{fig:slika6}, izračunana energija pa je podana v tabeli \ref{table:tabela2}.
+
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.73\textwidth]{Li_resevanje_konvergenca.png}
+\caption{Spreminjanje $R(x)$ funkcije z vsako iteracijo. $R_0$ je začetni približek. } \label{fig:slika5}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.73\textwidth]{Li_resevanje_lastne.png}
+\caption{Lastne vrednosti za funkcije $R_i$. } \label{fig:slika6}
+\end{center}
+\end{figure}
+
+\begin{table}[H] 
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline
+$\textrm{Li}^{+}$      & Račun  & Meritev \\ \hline
+$E$ [eV] & -199.25 & -198.04  \\ \hline
+\end{tabular}
+\end{center}
+\caption{Izračunana energija za litij}
+\label{table:tabela2}
+\end{table}
+
+\noindent Opazimo, da za litijev anion metoda še  hitreje konvergira, kot v prejšnjem primeru za helijev atom. 
+
+\section*{Vodikov ion (H$^{-}$)}
+
+Poskusimo isto metodo še na vodiku H$^{-}$. Metoda za $Z=1$ ni uspešna, saj stvari pričnejo divergirati. To je razvidno iz slik \ref{fig:slika7}, \ref{fig:slika8} in \ref{fig:slika9}.
+Lastne vrednostni vsake posamezne $R_i$, prikazane na sliki \ref{fig:slika8}, divergirajo v dve skrajnosti. Tako dobimo dvoje rešitev funckij $R_i$. Te rešitve so prikazane na sliki \ref{fig:slika7}. Kot pričakovano tudi te rešitve divergirajo v dve skrajnosti, kot lastne vrednosti. Dobimo vedno bolj vezana stanja in vedno manj vezana stanja in na koncu nevezano stanje za $E>0$. Spreminjanje energije je razvidno s slike \ref{fig:slika9}. Zaključimo Metoda ni stabilna za $Z=1$
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.73\textwidth]{H_resevanje_konvergenca.png}
+\caption{Spreminjanje $R(x)$ funkcije z vsako iteracijo za $Z=1$. $R_0$ je začetni približek. } \label{fig:slika7}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.73\textwidth]{H_resevanje_lastne.png}
+\caption{Lastne vrednosti za funkcije $R_i$ za $Z=1$. } \label{fig:slika8}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.73\textwidth]{H_resevanje_energija.png}
+\caption{Izračunane energije za $R_i$ za $Z=1$. } \label{fig:slika9}
+\end{center}
+\end{figure}
+
+Želimo ugotoviti, za kateri $Z$ je metoda stabilna. Tukaj bomo malenkost poguljufali z informacijo iz predavanj, da je metoda še stabilna okoli $Z=1.06$. Izkaže se, da je naš napisan algoritem stabilen še za $Z=1.05$, za $Z=1.04$ pa ne več. Pri $Z=1.05$ je konvergenca že zelo počasna in s slik \ref{fig:slika10},\ref{fig:slika11} in \ref{fig:slika12} praktično neopazna. Na videz dobimo dve rešitvi, ki pa zelo počasi konvergirata k eni skupni.
+
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.73\textwidth]{H_resevanje_3_konvergenca.png}
+\caption{Spreminjanje $R(x)$ funkcije z vsako iteracijo za $Z=1.05$. $R_0$ je začetni približek. } \label{fig:slika10}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.73\textwidth]{H_resevanje_3_lastne.png}
+\caption{Lastne vrednosti za funkcije $R_i$ za $Z=1.05$. } \label{fig:slika11}
+\end{center}
+\end{figure}
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.73\textwidth]{H_resevanje_3_energija.png}
+\caption{Izračunane energije za $R_i$ za $Z=1.05$. } \label{fig:slika12}
+\end{center}
+\end{figure}
+
+Za konec še poskusimo oceniti energijo za vodikov ion (H$^{-}$). Poračunali smo, kakšne energije dobimo za $Z$ od 2 do 1.08, na te podatke fitali polinom 6-stopnje in eksponentno funkcijo in izračunali vrednost naših fitanih funkcij za $Z=1$.
+Fit prikazuje slika \ref{fig:slika13}. Dobimo za
+\begin{itemize}
+\item[polinom:] $E=$ -12.4194 eV
+\item[funkcija:] $E=$ -12.1569 eV
+\end{itemize}
+kar pa se še vedno razlikuje dosti od prave vrednosti.
+
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.55\textwidth]{energija_H_0.png}
+\caption{Fit k energiji} \label{fig:slika13}
+\end{center}
+\end{figure}
+
+\end{document}
