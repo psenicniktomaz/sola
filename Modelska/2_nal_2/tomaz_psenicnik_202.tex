@@ -1,0 +1,263 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene]{babel}    % naloži, med drugim, slovenske delilne vzorce
+
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{amsmath}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}} %naredi vector kot bold zapis
+
+\usepackage{float}
+
+\usepackage{amssymb}
+
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[slovene]{babel}
+%\usepackage[latin2]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{makeidx}%za stvarno kazalo
+%\makeindex%naredi stvarno kazalo
+%\usepackage{tikz}% paket za kroge
+
+\title{\textbf{Modelska analiza 2} \\ 2. naloga - Navadne diferencialne enačbe: robni problem \\}
+	\author{Študent: Pšeničnik Tomaž}
+	
+	
+
+
+	
+\begin{document}
+
+\pagenumbering{gobble}
+
+	\begin{figure} [h]
+  \centering
+  \includegraphics[width=12 cm]{logo_fmf.png}
+  \maketitle
+\end{figure}
+	
+	
+	
+	\newpage
+	\pagenumbering{arabic}
+	
+	
+	
+\section*{Oblika vrteče se vrvice}
+
+Tokratna naloga je izračunati  obliko vrteče vrvice, ki je pripeta na obeh koncih. Problem je prikazan na sliki \ref{fig:slika1}.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.2\textwidth]{vrvica.pdf}
+    \caption{Skica vrteče se vrvice.} \label{fig:slika1}
+\end{figure}
+
+\noindent Najprej si poglejmo, kako pridemo do seta enačb (\ref{eq:enacba1}), ki so znane za vrtečo se vrv:
+\begin{align} \label{eq:enacba1}
+\frac{d}{ds} \left(F\frac{dx}{ds} \right) + \rho \omega ^{2} x =& 0 \nonumber  \\
+\frac{d}{ds} \left(F\frac{dy}{ds} \right) -\rho g =& 0  \nonumber \\
+\left( \frac{dx}{ds} \right) ^{2} + \left( \frac{dy}{ds} \right) ^{2} =& 1.
+\end{align}
+Zamislimo si napet košček vrvi, prikazan na sliki \ref{fig:slika2}.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.7\textwidth]{eq_struna.pdf}
+    \caption{Delček vrvi.} \label{fig:slika2}
+\end{figure}
+\noindent Za košček vrvi dolžine $ds$ in z gostoto $\rho$ zapišimo Newtonov zakon $m a=F$ v $x$ in $y$ smeri:
+\begin{align} \label{eq:enacba2}
+ds \rho \frac{\partial ^{2} x}{\partial t^{2}} & =  (F(s +ds) - F(s)) \frac{dx}{ds} + \rho ds \omega ^{2} x \nonumber \\
+ds \rho \frac{\partial ^{2} y}{\partial t^{2}} & =  (F(s +ds) - F(s)) \frac{dy}{ds} - ds \rho g.
+\end{align}
+Enačbi (\ref{eq:enacba2}) delimo z $ds$ in postavimo v stacionarno stanje ($\frac{d}{dt} \rightarrow 0)$. Na desni strani prepoznamo odvod po sili. Zapišemo samo še Pitagorov izrek (\ref{eq:enacba3})
+\begin{equation} \label{eq:enacba3}
+ds^{2}  = dx^{2} +dy^{2}
+\end{equation}
+in dobimo set enačb \ref{eq:enacba1}. S substitucijami $s \rightarrow s/l, \ \ x\rightarrow x/l, \ \ y \rightarrow y/l, \ \ F \rightarrow F/\rho gl, \ \ dx/ds = \cos \alpha, \ \ dy/ds = \sin \alpha, \ \ \beta = \omega ^{2} l/g$, če je $l$ dolžina vrvi, pretvorimo sistem (\ref{eq:enacba1} v sledeči sistem \ref{eq:enacba4}:
+ \begin{align} \label{eq:enacba4}
+ \frac{dx}{ds} &= \cos \alpha  &\qquad \frac{dy}{ds} & = \sin \alpha \nonumber \\ 
+ \frac{dF}{ds}& = -\beta x \cos \alpha + \sin \alpha & \qquad \frac{d \alpha }{ds} &= \frac{1}{F} \left( \beta x \sin \alpha + \cos \alpha \right).
+ \end{align}
+Poznamo obesišči vrvice. Zgornje obesišče ima koordinate (0,0), spodnje obesišče pa postavimo na (0,$y_f$), pri čemer je $|y_f| < l$.
+
+Računanja se bomo lotili s strelsko metodo. Reševali bomo sistem enačb (\ref{eq:enacba4}), pri čemer bomo pričeli integrirati v začetni točki ($x=0,y=0$) po celotni dolžini $l$ vrvice in poskušali najti ustrezne parametre, da je konec vrvice v točki ($x=0,y=y_f$. Določimo $\beta$ in vzamemo prvi približek naklona v začetni točki $\alpha _0$ in začetni približek sile $F_0$. Prva integracija (skoraj) zagotovo ne bo dala pravilne rešitve, zato bomo glede na prvo rešitev vzeli primeren naslednji približek in ponavljali postopek, dokler metoda ne skonvergira.
+
+Metoda ni delovala za vse $\beta$, in sicer za $\beta \lesssim 2.5$. Za zelo visoke $\beta$ metoda ni bila preizkušena. Poglejmo si za začetek nekatere oblike vrvice, z začetnim približkom naklona in sile $\alpha_0=0, \ \ F_0=1$. Rešitve so prikazane na slikah \ref{fig:slika3}. Kot vidimo na slikah \ref{fig:slika3}, dobimo za male $\beta$ intuitivno rešitev, za večje $\beta$ pa rešitve delujejo kot neke vrste višji harmoniki... Te rešitve niso fizikalno smiselne, saj se vrteča se vrvica ne postavi v takšno obliko. Metoda  pač konvergira k eni izmed rešitvi enačb glede na začetni približek.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{oblika_vrvi.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrvica_4.pdf}
+    \end{subfigure}
+    \caption{Oblika vrvi za začetni približek naklona in sile $\alpha_0=0, \ \ F_0=1$. } \label{fig:slika3}
+\end{figure} 
+\noindent Pogledamo si lahko maksimalen odmik in silo, ki deluje na vpeto vrvico v točki ($x=0,y=0$). Maksimalen odmik in silo glede na izbrano $\beta$ prikazuje slika \ref{fig:slika4}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrvica_5.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrvica_5_sila.pdf}
+    \end{subfigure}
+    \caption{Največji odmik vrvice levo in potek sile $F_0$ v odvisnosti od $\beta$.} 
+    \label{fig:slika4}
+\end{figure}
+
+\noindent Odmik se z večanjem beta povečuje, pri $\beta \sim 20$ dobimo prvi višji harmonik, sledi ponoven skok, kjer vrvica prevzame podobno obliko za $\beta=12$ na sliki \ref{fig:slika3}. Sledi ponoven skok, kjer je odmik praktično konstanten in rahlo pada z večanjem $\beta$. V tem režimu vrvica prevzame obliko nekega harmonika. Enako se dogodi pri grafu za $F_0$.
+
+Stvari smo si pogledali vedno za nov isti začetni približek. Drugače je, če za začetni približek naslednje $\beta$ vzamemo rezultat $\alpha_0$ in $F_0$ prejnšje $\beta$. Takrat ne dobimo več harmonikov, temveč le eno obliko vrvi, kar je fizikalno smiselen rezultat. Takšen rezultat prikazuje slika \ref{fig:slika5}.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.5\textwidth]{vrvica_7.pdf}
+    \caption{Oblika vrvi.} \label{fig:slika5}
+\end{figure}
+
+\noindent Tudi rezultata za maksimalen odmik in silo sta pričakovana. Ogledamo si ju lahko na slikah \ref{fig:slika6}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrvica_8.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrvica_8_sila.pdf}
+    \end{subfigure}
+    \caption{Največji odmik vrvice levo in potek sile $F_0$ v odvisnosti od $\beta$.} 
+    \label{fig:slika6}
+\end{figure}
+
+\section*{H\'enon in Heiles-ov potencial}
+Pri študiju gibanja zvezd skozi galaksijo sta H\'enon in Heiles vpeljala 3-števno simetrični potencial:
+\begin{equation} \label{eq:enacba5}
+U(x,y)=\frac{1}{2}(x^{2} +y^{2}) + x^{2}y -\frac{1}{3}y^{3}.
+\end{equation}
+Na sliki \ref{fig:slika7} je prikazan potencial (\ref{eq:enacba5}) z nekaj ekvipotencialnimi krivuljami. Gibanje v potencialu je omejeno za energije $E < 1/6$. Tako se bomo skoncentrirali le na gibanje v tem območju, ki je na sliki \ref{fig:slika7} omejeno s trikotnikom.
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.7\textwidth]{potencial_1.pdf}
+    \caption{Potencial (\ref{eq:enacba5}) in nekaj ekvipotencialnih krivulj.} \label{fig:slika7}
+\end{figure}
+\noindent Zapišemo lahko Hamiltonian za naš sistem:
+\begin{equation} \label{eq:enacba6}
+H=T+U \rightarrow H= \frac{1}{2}(\dot{x}^{2} +\dot{y}^{2}) +U
+\end{equation}
+in vpeljemo spremenljivki $\dot{x}=u$ in $\dot{y}=v$. Iz Hamiltonijana zapišemo sistem enačb oz. enačbe gibanja:
+\begin{align} \label{eq:enacba7}
+\dot{x}&=u=\frac{\partial H}{\partial u} &\qquad \dot{y} &= v=\frac{\partial H}{\partial v} \nonumber \\
+\dot{u}&= -\frac{\partial H}{\partial x}= -x -2xy & \qquad \dot{v}&=-\frac{\partial H}{\partial y}= -y -x^{2} +y^{2}
+\end{align}
+
+Podobno kot v prejšnji nalogi z vrvico, se bomo iskanja periodičnih orbital lotili s strelsko metodo, le da imamo edini pogoj konstantno energijo. Za začetni pogoj izberemo točko, v našem primeru bo to vedno $x_0=0$, $y_0$ pa bomo spreminjali, dokler ne bomo dobili zadovoljivega zadnjega  ali predzadnjega presečišča pri $x=0$ in $|y_0-y_p|< \epsilon$. Ko podamo začetno točko, imamo določeno kinetično energijo v tej točki, ni pa določene smeri hitrosti. Tako bomo hkrati s presečiščem pri $x=0$ iskali še začetno podano smer $\alpha_0$ tako, da bo veljalo $|\alpha_0 - \alpha_p| < \epsilon $ za dano presečišče. Pri vsakem iskanju trajektorije fiksiramo čas. Pri integraciji bomo vedno uporabili časovni korak $dt=0.001$ in sistemski $\epsilon$ pri iskanju ničel z modulom \texttt{scipy.optimize.root}.
+
+Ob najdenih parametrih $y_0$ in $alpha_0$, je koristno pogledati, kako se sistem obnaša, če enačbe gibanja (\ref{eq:enacba7}) integriramo po zelo dolgem času. Opazimo, da nekatere dobljene rešitve niso primerne, saj imamo kvazi-periodično gibanje. Taka primera sta prikazana na slikah \ref{fig:slika8}. Črni piki na grafih, vedno prikazujeta začetno točko pri $x_0=0$ in končno točko po končanem integriranju do časa $t$.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_12.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_12_daljsa.pdf}
+    \end{subfigure}
+   
+        \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_13.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_13_daljsa.pdf}
+    \end{subfigure}
+    \caption{Kvazi-periodicni orbiti.} 
+    \label{fig:slika8}
+\end{figure}
+
+Program pri različnih pogojih konvergira k različnim rešitvam. Zanimive so linearne orbite, prikazane na slikah \ref{fig:slika9}. Gibanje je omejeno do ekvipotencialne krivulje.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_8.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_8_daljsa.pdf}
+    \end{subfigure}
+   
+        \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_10.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_10_daljsa.pdf}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_9.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_9_daljsa.pdf}
+    \end{subfigure}
+    \caption{Linearne orbite.} 
+    \label{fig:slika9}
+\end{figure}
+\noindent Največkrat je program skonvergiral k pogojem za orbito v obliki zaključene zanke. Oblika te orbite je prikazana na slikah \ref{fig:slika10}. Kot vidimo, nekega pravila ni, h kateri rešitvi program skonvergira. Za zadnji dve orbiti smo morali spremeniti začetne pogoje iskanja. Zadnje tri orbite so razvidni na desni sliki \ref{fig:slika10}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_krogi.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_krogi_2.pdf}
+    \end{subfigure}
+    \caption{Zaključena zanka pri različnih konstantnih energijah. Začetni "guess" parametri so $y_0, \ \ \alpha_0$ za nek konstanten čas integracije $t$.} 
+    \label{fig:slika10}
+\end{figure}
+
+Za konec si poglejmo še nekaj periodičnih orbit, ki smo jih dobili z naključnimi začetnimi parametri. Prikazane so na sliki \ref{fig:slika11}. Obstaja še več periodičnih orbit, ki pa jih s strelsko metodo nismo odkrili, oziroma, smo premalo preskušali različne začetne približke parametrov. Nekateri začetni približki $y_0$ so izven trikotnika na sliki potenciala \ref{fig:slika7}, za kar se ne bomo zmenili, saj je bil program spisan tako, da ustrezno preslika začetni pogoj v notranjost trikotnika.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_2.pdf}
+    \end{subfigure}
+   
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_3.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_4.pdf}
+    \end{subfigure}
+    
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_6.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_7.pdf}
+    \end{subfigure}
+    
+        \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_11.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{periodicne_orbite_14.pdf}
+    \end{subfigure}
+    \caption{Nekaj periodičnih orbit} 
+    \label{fig:slika11}
+\end{figure}
+
+
+\end{document}

@@ -1,0 +1,253 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene]{babel}    % naloži, med drugim, slovenske delilne vzorce
+
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{amsmath}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}} %naredi vector kot bold zapis
+
+\usepackage{float}
+
+\usepackage{amssymb}
+
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[slovene]{babel}
+%\usepackage[latin2]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{makeidx}%za stvarno kazalo
+%\makeindex%naredi stvarno kazalo
+%\usepackage{tikz}% paket za kroge
+
+\title{\textbf{Modelska analiza 2} \\ 11. naloga - Gibanje neraztegljive vrvice \\}
+	\author{Študent: Pšeničnik Tomaž}
+	
+	
+
+
+	
+\begin{document}
+
+\pagenumbering{gobble}
+
+	\begin{figure} [h]
+  \centering
+  \includegraphics[width=12 cm]{logo_fmf.png}
+  \maketitle
+\end{figure}
+	
+	
+	
+	\newpage
+	\pagenumbering{arabic}
+	
+	
+
+\section*{Gibanje neraztegljive vrvice}
+
+Tokratna naloga je simulirati gibanje homogene neraztegljive viseče vrvice. Najprej zapišimo osnovne diferencialne enačbe prosto viseče vrvice:
+\begin{align}
+0 \neq \rho _l \frac{\partial ^{2} x}{\partial t^{2}} = \frac{\partial}{\partial s} \left(F \frac{\partial x}{\partial s} \right) + f_x, \label{eq:enacba1} \\
+0 \neq \rho _l \frac{\partial ^{2} y}{\partial t^{2}} = \frac{\partial}{\partial s} \left(F \frac{\partial y}{\partial s} \right) + f_y, \label{eq:enacba2} \\
+\left(  \frac{\partial x}{\partial s}\right)^{2} + \left(  \frac{\partial y}{\partial s}\right)^{2} =1, \label{eq:enacba3}
+\end{align}
+kjer so $\rho _l $ gostota vrvice in $f_x$ ter $f_y$ sili v danih smereh. Gosoto vrvice in silo v $y$ smeri $f_y=\rho_l g$ postavimo kar na ena, sila v $x$ smeri $f_x$ pa je nič. Z nastavkoma, ki predstavljata kot naklona vrvice
+\begin{align*}
+\frac{\partial x}{ \partial s}= \cos (\varphi), \qquad \frac{\partial y}{ \partial s}= \sin (\varphi), \qquad \varphi = \varphi(s),
+\end{align*}
+želimo najti odvisnost $F$ in $\varphi$ v odvisnosti od $s$ in časa. Nastavka vstavimo v (\ref{eq:enacba1}) in (\ref{eq:enacba2}), ter tako dobimo:
+\begin{align}
+\frac{\partial ^{2} x}{\partial t^{2}} =& \frac{\partial F}{\partial s} \cos \varphi - F \sin \varphi \frac{ \partial \varphi}{\partial s} \label{eq:enacba4}\\
+\frac{\partial ^{2} y}{\partial t^{2}} =& \frac{\partial F}{\partial s} \sin \varphi + F \cos \varphi \frac{ \partial \varphi}{\partial s} +1. \label{eq:enacba5}
+\end{align}
+Enačbi (\ref{eq:enacba4}) in (\ref{eq:enacba5}) odvajamo po $s$ in dobimo:
+\begin{align}
+ \textrm{i)} \ \  \frac{\partial ^{2}}{ \partial t ^{2}} \cos(\varphi)=& - 2 \sin(\varphi) F^{\prime} \varphi ^{\prime} - \cos (\varphi) F (\varphi ^{\prime})^{2} + \cos(\varphi) F^{\prime \prime} - F \sin(\varphi) \varphi ^{\prime \prime},  \nonumber \\
+ \textrm{ii)} \ \  \frac{\partial ^{2}}{ \partial t ^{2}} \sin(\varphi)=& 2 \cos(\varphi) F^{\prime} \varphi ^{\prime} - \sin (\varphi) F (\varphi ^{\prime})^{2} + \sin(\varphi) F^{\prime \prime} + F \cos(\varphi) \varphi ^{\prime \prime},  \nonumber
+\end{align}
+kjer $^{\prime}$ označuje odvod po $s$. Dobimo koristni zvezi med $F$ in $\varphi$:
+\begin{align}
+\textrm{i)} \sin \varphi - \textrm{ii)} \cos \varphi: \ \ & \ddot{\varphi} = 2 \frac{\partial F}{\partial s} \frac{ \partial \varphi}{\partial s} + F \frac{\partial ^{2} \varphi}{\partial s^{2}}  \label{eq:enacba6} \\
+\textrm{i)} \cos \varphi + \textrm{ii)} \sin \varphi: \ \ & \dot{\varphi}^{2} = F \left( \frac{\partial \varphi}{\partial s} \right)^{2} - \frac{\partial ^{2} F}{\partial s^{2}}. \label{eq:enacba7}
+\end{align}
+Enačba (\ref{eq:enacba7}) predstavlja enačbo za silo, kjer levo stran obravnavamo kot partikularni del, enačba (\ref{eq:enacba6}) pa predstavlja enačbo za kote v novem časovnem koraku.
+
+Zapišimo še robne pogoje za vrvico. Vemo, da mora biti odmik vrvice, kjer je pripeta na strop pri $s=0$, enak nič. Torej veljata enačbi:
+\begin{align}
+0 &= \frac{\partial F}{\partial s} \cos \varphi - F \sin \varphi \frac{ \partial \varphi}{\partial s} \label{eq:enacba8}\\
+0 &= \frac{\partial F}{\partial s} \sin \varphi + F \cos \varphi \frac{ \partial \varphi}{\partial s} +1, \label{eq:enacba9}
+\end{align}
+pri $s=0$. Podobno kot smo dobili enačbi (\ref{eq:enacba6}) in (\ref{eq:enacba7}), dobimo enačbi \ref{eq:enacba10} in \ref{eq:enacba11} za robni pogoj pri $s=0$:
+\begin{align}
+(\ref{eq:enacba8}) \sin \varphi - (\ref{eq:enacba9}) \cos \varphi \ \ : \qquad  0& = F \frac{\partial \varphi}{\partial s} + \cos \varphi, \label{eq:enacba10} \\
+(\ref{eq:enacba8}) \cos \varphi + (\ref{eq:enacba9}) \sin \varphi \ \ : \qquad  0& = \sin \varphi + \frac{\partial F}{\partial s}. \label{eq:enacba11}
+\end{align}
+Robni pogoj na koncu vrvice oz. pri $s=1$ določa, da je sila enaka nič $F=0$. Potrebujemo pa še en robni pogoj. Smiseln robni pogoj se zdi, da je ukrivljenost na koncu vrvice enaka 0 ali konstanta. Pogoj zapišemo:
+\begin{align*}
+\frac{\partial ^{2} \varphi}{\partial s^{2}} \Big|_{s=1}=0  \ \ \textrm{ali} \ \ const.
+\end{align*}
+
+Reševanja se lotimo tako, da vrv najprej razdelimo na enako dolge dele $\Delta s$ in jo postavimo v nek začetni položaj. Primer za diskretizacijo vrvi in začetni položaj je prikazan na sliki \ref{fig:slika1}. Sile in kote izračunamo, kot na skici \ref{fig:slika1}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_skica.pdf}
+    \end{subfigure}
+    \caption{Skica primera diskretizacije vrvi kjer imamo $N=6$ in s tem 7 točk.} \label{fig:slika1}
+\end{figure}
+
+\noindent Sedaj je potrebno ustrezno diskretizirati enačbe  (\ref{eq:enacba6}), (\ref{eq:enacba7}), (\ref{eq:enacba10}), (\ref{eq:enacba11}) in enačbo za robni pogoj pri $s=1$. Uporabljali bomo zapis $\varphi ^{n} _i = \varphi (s_i=i\Delta s ,t_n=n \Delta t)$. Dobimo:
+\begin{align}
+\frac{\varphi ^{n+1} _i - 2\varphi ^{n} _i + \varphi ^{n-1} _i}{(\Delta t)^{2}}&= \frac{(F^{n}_{i+1} - F^{n}_{i-1})(\varphi ^{n}_{i+1} - \varphi^{n}_{i-1}i )}{2 (\Delta s)^{2}} + F_i ^{n} \frac{\varphi ^{n} _{i+1} -2\varphi ^{n} _{i} +\varphi ^{n} _{i-1}}{(\Delta s)^{2}} \label{eq:enacba12} \\
+\left(\frac{\varphi ^{n}_i - \varphi ^{n-1}_i}{\Delta t}\right)^{2} &= F_i \left(\frac{\varphi _{i+1} ^{n} - \varphi ^{n} _{i-1}}{2\Delta s} \right) ^{2} - \frac{F^{n} _{i+1} - 2F_i ^{n} + F^{n} _{i-1}}{(\Delta s) ^{2}} \label{eq:enacba13} \\
+0&=F_0 ^{n} \frac{\varphi _2 ^{n+1} - \varphi_0 ^{n+1}}{2 \Delta s} + \cos \varphi _1 ^{n+1} \label{eq:enacba14} \\
+0&= \sin \varphi _0 ^{n} + \frac{F_1 ^{n} -F_0 ^{n}}{\Delta s} \label{eq:enacba15} \\
+\frac{\partial ^{2} \varphi}{\partial s^{2}} \Big|_{s=1}&=0 \rightarrow \frac{\varphi ^{n+1} _N - 2\varphi ^{n+1} _{N-1} + \varphi ^{n+1}_ {N-2}}{(\Delta s)^{2}}=0. \label{eq:enacba16}
+\end{align}
+Enačbi (\ref{eq:enacba12}) in (\ref{eq:enacba13}) veljata za $i = 2,3,4...,N-1$. V začetnem stanju imamo podane $\varphi_i ^{0}$, iz katerih izračunamo silo v vsaki točki z uporabo enačb (\ref{eq:enacba14}) in (\ref{eq:enacba13}). Sila na koncu vrvi je trivialna in velja $F^{n} _N =0$. Nato izačunamo $\varphi _i ^{n+1}$ za vse možne točke iz enačbe (\ref{eq:enacba12}). Dodamo še robni točki iz enačb (\ref{eq:enacba15}) in (\ref{eq:enacba16}). Ponovno izračunamo silo in postopek ponovimo za naslednji časovni korak.
+
+Za začetek si poglejmo vrvico razdeljeno na 20 delov, ki jo spustimo iz kota 1 rad (57.295°) merjeno od horizontale. Časovni korak je 0.01 enote. Gibanje vrvice in njenega konca prikazujeta sliki \ref{fig:slika2}. 
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_2.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_3.pdf}
+    \end{subfigure}
+    \caption{Gibanje vrvice za prvi primer.} \label{fig:slika2}
+\end{figure}
+
+\noindent S tako izbranim kotom, še nimamo nobenih težav. V nadaljevanju bomo videli, da če spustimo vrvico z manjšega kota - merjeno od horizontale, naletimo na težave. Na slikah \ref{fig:slika2} opazimo, da vrvica nikoli ne preleti ravnovesne lege v iztegnjenem stanju. Vidimo tudi, da se najprej začnejo pomikati zgornji deli in šele nato spodnji deli. Razlagamo si lahko na sledeč način. Če si zamislimo vsak odsek vrvice kot navadno fizično nihalo, nihajo odseki, ki so bližje pritrdišču, z višjo frekvenco in manjšo amplitudo odmikov kot bolj oddaljeni odseki, ki imajo nižjo frekvenco in večjo amplitudo odmikov. Seveda se stvar pri vrvici čez čas zaplete, toda v prvem približku bi jo lahko obravnavali razeljeno na fizična nihala.
+
+Poglejmo si, kako je z ohranitvijo energije in ‘‘pretakanjem’’ energij iz ene v drugo, kar je prikazano na slikah \ref{fig:slika3}. Potencialno energijo smo definirali kot
+\begin{equation*}
+E_{pot}= 0,5 + \sum_i \Delta s \cdot y_i ^{*},
+\end{equation*}
+ kjer $^{*}$ označuje težišče posameznega odseka vrvi, $m$ in $g$ pa postavili na 1. Prišteli smo še polovičko, zaradi boljše preglednosti na grafih. Pri kinetični energiji nastopa odvod hitrosti težišča posameznega odseka vrvi. Definiramo jo kot
+ \begin{equation*}
+ E_{kin}= \sum _{i=0} \frac{\left( x_{i+1} ^{*} - x{i}^{*}  \right)^{2} +\left( y_{i+1}^{*} - y{i} ^{*}  \right)^{2} }{\Delta t ^{2}}.
+ \end{equation*}
+Ostane nam le še definicija rotacijske energije posameznih delčkov vrvi
+\begin{equation*}
+E_{rot}= \sum_{i=0} \frac{\Delta s ^{3}}{24} \left(\frac{\varphi _{i+1} - \varphi_i}{ \Delta t} \right)^{2}.
+\end{equation*}
+ 
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_4_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_4_2.pdf}
+    \end{subfigure}
+    \caption{Energije.} \label{fig:slika3}
+\end{figure}
+
+\noindent Opazimo neke vrste oscilacijo kinetične energije in potencialne energije. Skupni seštevek teh dveh energij je, recimo da, konstanten. Rotacijska energija je večino časa zanemarljivo majhna, nastopi le, ko zaniha zadnji odsek (ali zadnjih nekaj odsekov?) vrvice, kar vidimo na desni sliki \ref{fig:slika3}, takoj po preletu čez ravnovesno lego.
+
+Poglejmo si še silo, ki nastopa vzdolž vrvice. Porazdelitev sile je prikazana na sliki \ref{fig:slika4}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_3_sila.pdf}
+    \end{subfigure}
+    \caption{Porazdelitev sile.} \label{fig:slika4}
+\end{figure}
+
+\noindent Sila je seveda največja v prijemališču vrvice in se zmanjšuje vzdolž vrvice. Ob trenutkih dobimo manjše sunke sile, ki nastopajo ravno ob času, ko zanihajo zadnji členki vrvice.
+
+Poskusimo lahko izboljšati ohranjanje energije za naš opisan primer. Razdelimo vrvico na 80 odsekov in poglejmo če se energija bolje ohranja. Časovni korak imamo enak 0,01 enote. Rezultati so prikazani na sliki \ref{fig:slika5}. Z rezultati smo bolj zadovoljni, saj so v celotni energiji manjša nihanja.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv80_4_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv80_4_2.pdf}
+    \end{subfigure}
+    \caption{Energije za vrvico iz 80 členkov in rotacijska energija do časa 2.} \label{fig:slika5}
+\end{figure}
+
+Podobno analizo lahko naredimo še za primere, ko spustimo vrvico z manjšega kota. Poglejmo si najprej, ko vrvico razdeljeno na 30 delov spustimo iz kota 0,5 rad z časovnim korakom 0.002 enote . Gibanje vrvice in njenega konca prikazujeta sliki \ref{fig:slika6}. 
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_2_eksoticna_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_2_eksoticna_2.pdf}
+    \end{subfigure}
+    \caption{Gibanje vrvice za drugi primer.} \label{fig:slika6}
+\end{figure}
+\noindent Podobno si pogledamo energije.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_2_eksoticna_3.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_2_eksoticna_4.pdf}
+    \end{subfigure}
+    \caption{Energije levo in rotacijska energija desno.} \label{fig:slika7}
+\end{figure}
+\noindent Podobno je s silami porazdeljenimi v vrvici.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.6\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_2_eksoticna_sila.pdf}
+    \end{subfigure}
+    \caption{Porazdelitev sile.} \label{fig:slika8}
+\end{figure}
+\noindent ponovno vidimo, da največja sila nastopi ravno takrat, ko močneje zanihajo zadnji odseki vrvice. Slika z rotacijsko energijo in silami se popolnoma ujemata.
+
+S kotom 0.5 rad od horizontale, še nismo imeli težav. Težave nastopijo, ko ta kot zmanjšamo na 0.3 rad (težave zagotovo nastopijo že prej, toda cilj ni ugotoviti točno pri katerem kotu), pri čemer smo uporabili časovni korak 0,002 enote. Z zmanjšanjem časovnega koraka le preložimo katastrofo na daljši čas. Ponovno si poglejmo gibanje vrvice in njenega konca, kar prikazujeta sliki \ref{fig:slika9}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_eksoticna_1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_eksoticna_2.pdf}
+    \end{subfigure}
+    \caption{Gibanje vrvice za tretji primer.} \label{fig:slika9}
+\end{figure}
+
+\noindent Gibanje postane bolj kaotično, vendar še vedno zgleda, da je OK. Toda ko pogledamo, kaj se dogaja z energijo na sliki \ref{fig:slika10}, vidimo, da je močna kršitev ohranitve energije. Zadovoljni smo z gibanjem vrvice do nekje 3,5 enot časa.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_eksoticna_3.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_eksoticna_4.pdf}
+    \end{subfigure}
+    \caption{Energije levo in rotacijska energija desno.} \label{fig:slika10}
+\end{figure} 
+
+\noindent Ponovno si oglejmo porazdelitev sil v vrvici na sliki \ref{fig:slika11}. Slika sicer ni zelo pregledna, vidimo pa, ko rotacijska energija zadnjič naraste, dobimo zelo veliko silo v vrvici. Sila, ki deluje v pritrdišču vrvice je približno 100x večja kot v primeru prosto viseče vrvice v mirovanju. Takšen model se težko zdi smiselen. Vidimo, da se nam giabnje vrvice poruši in ne dobimo več prave rešitve.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.8\textwidth}  			
+        \includegraphics[width=\textwidth]{vrv_eksoticna_sila.pdf}
+    \end{subfigure}
+    \caption{Porazdelitev sile.} \label{fig:slika11}
+\end{figure}
+
+
+\end{document}

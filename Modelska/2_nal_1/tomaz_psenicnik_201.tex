@@ -1,0 +1,280 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene]{babel}    % naloži, med drugim, slovenske delilne vzorce
+
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{amsmath}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}} %naredi vector kot bold zapis
+
+\usepackage{float}
+
+\usepackage{amssymb}
+
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[slovene]{babel}
+%\usepackage[latin2]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{makeidx}%za stvarno kazalo
+%\makeindex%naredi stvarno kazalo
+%\usepackage{tikz}% paket za kroge
+
+\title{\textbf{Modelska analiza 2} \\ 1. naloga - Navadne diferencialne enačbe: začetni problem \\}
+	\author{Študent: Pšeničnik Tomaž}
+	
+	
+
+
+	
+\begin{document}
+
+\pagenumbering{gobble}
+
+	\begin{figure} [h]
+  \centering
+  \includegraphics[width=12 cm]{logo_fmf.png}
+  \maketitle
+\end{figure}
+	
+	
+	
+	\newpage
+	\pagenumbering{arabic}
+	
+	
+	
+\section*{Gibanje planeta okoli sonca}
+
+V nalogi obravnavamo keplersko gibanje v 2D planeta okoli zvezde, katero postavimo v izhodišče. Med telesoma velja velja Newtonov zakon o gravitaciji
+\begin{equation} \label{eq:gravity}
+F=m \ddot{\vec{r}}= -G \frac{mM}{r^{3}} \vec{r},
+\end{equation}
+kjer je  $m$ masa planeta in $M$ masa zvezde, $\vec{r}$ vektor razdalje med njima in $G$ gravitacijska konstanta.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{krozenje_planeta.png}
+    \caption{Skica problema.} \label{fig:slika1}
+\end{figure}
+
+\noindent Problem rešujemo v kartezičnem sistemu, kjer zapišemo $\vec{r}=
+\begin{bmatrix}
+    x \\
+   y
+\end{bmatrix}
+$ in $\dot{\vec{r}}= \begin{bmatrix}
+    \dot{u} \\
+   \dot{v}
+\end{bmatrix} $.
+Enačbo (\ref{eq:gravity}) prevedebo na sistem 4 enačb 1. reda:
+\begin{align}
+ \dot{x}&= u ,\nonumber \\
+ \dot{y}&=v, \nonumber \\
+ \dot{u}&=-G\frac{M m x}{(x^{2} +y^{2})^{3/2}}, \nonumber \\
+ \dot{v}&=-G\frac{M m y}{(x^{2} +y^{2})^{3/2}}.
+\end{align}
+Podamo začetne pogoje:
+\begin{equation}
+x(0)=a, \qquad y(0)=0, \qquad u(0)=0, \qquad v(0)=v_0 \omega a,
+\end{equation}
+kjer je $a$ začetna razdalja, $v_0 \omega a$ pa začetna hitrost, kjer uvedemo $v_0$ kot brezdimenzijski parameter. Sistem je preglednejši v brezdimenzijski obliki, kjer upoštevamo transformacijo:
+\begin{equation}
+\frac{x,y}{a} \rightarrow x,y, \qquad \frac{u,v}{\omega a} \rightarrow u,v, \qquad \omega t \rightarrow t
+\end{equation}
+in uporabimo \begin{equation}
+G=M=a=\omega=1,
+\end{equation}
+s čimer dobimo nov sistem enačb:
+\begin{align}
+ \dot{x}&= u ,\nonumber \\
+ \dot{y}&=v, \nonumber \\
+ \dot{u}&=-\frac{ x}{(x^{2} +y^{2})^{3/2}}, \nonumber \\
+ \dot{v}&=-\frac{ y}{(x^{2} +y^{2})^{3/2}}
+\end{align}
+z začetnimi pogoji 
+\begin{equation}
+x(0)=1, \qquad y(0)=0, \qquad u(0)=0, \qquad v(0)=v_0.
+\end{equation}
+
+Oglejmo si primere z različnimi začetnimi hitrostmi. Rezultati so prikazani na sliki \ref{fig:slika2} Izkaže se, da glede na različne vrednosti $v_0$ dobimo različne oblike tirov gibanja planeta:
+\begin{itemize}
+\item $v_0 < 1$, $\qquad$ elipsa,
+\item $v_0 =1$, $\qquad$ krožnica,
+\item $v_0 >1$, $\qquad$ elipsa,
+\item $v_0=\sqrt{2}$, $\qquad$ hiperbola,
+\item $v_0 > \sqrt{2}$, $\qquad$ parabola.
+\end{itemize}
+Računali bomo z metodo Runge-Kutta podano v knjižici \textsf{scipy.integrate.ode}, kjer definiramo diferencialno enačbo in njen Jacobian.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.8\textwidth]{gibanje_planeta1.png}
+    \caption{Tiri za gibanje planeta okoli zvezde.} \label{fig:slika2}
+\end{figure}
+
+O natančnosti rešitve lahko govorimo, če si pogledamo konstante gibanja, kot so energija, vrtilna količina, radij pri krožnici in natančnost povratka pri krožnici in elipsi.
+
+Najprej si poglejmo ohranjanje radija pri krožnici na sliki \ref{fig:slika3}. Natančnost radija se veča z manjšanjem koraka. Zadnja najmanjša koraka se praktično ne razlikujeta, zato bodo vse naslednje ohranitvene konstante poračunane pri koraku $dt=0.001$.
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.6\textwidth]{gibanje_planeta_kroznica.pdf}
+    \caption{$|r-r_0|$ glede na izbran časovni korak.} \label{fig:slika3}
+\end{figure}
+\noindent Poglejmo si natančnost povratka za nekaj različnih začetnih hitrosti. Rezultate prikazujeta sliki \ref{fig:slika4}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{povratek2.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{povratek3.pdf}
+    \end{subfigure}
+    \caption{Natančnost povratka za krožnico in elipso pri $dt=0.001$.} \label{fig:slika4}
+\end{figure}
+
+\noindent Preostaneta nam še energija in vrtilna količina. Energijo poračunamo po enačbi
+\begin{equation} \label{eq:enacba8}
+E=T+V= \frac{1}{2} (u^{2} + v^{2}) - 1/ \sqrt{x^{2} +y^{2}}.
+\end{equation}
+Na sliki \ref{fig:slika5} levo vidimo, da je energija konstantna. Na desni sliki \ref{fig:slika5} je prikazan napaka $|E_0 -E|$.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{energija.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{energija_razlika.pdf}
+    \end{subfigure}
+    \caption{Energija in napaka energije.} \label{fig:slika5}
+\end{figure}
+
+\noindent Podobno storimo za vrtilno količino, ki jo izračunamo kot:
+\begin{equation}
+\Gamma = \vec{r} \times \vec{p}= (0,0, xv-yu).
+\end{equation}
+Na slikah \ref{fig:slika6} vidimo obnašanje vrtilne količine in njene napake.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrtilna.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{vrtilna_razlika.pdf}
+    \end{subfigure}
+    \caption{Vrtilna količina  in napaka vrtilne količine.} \label{fig:slika6}
+\end{figure}
+
+
+\section*{Sistem treh teles}
+
+Mimo zvezde, okoli katere kroži planet, pridrvi v tirno ravnino druga zvezda z enako maso. Mimobežna zvezda vpada s hitrostjo, ki je enaka dvakratni obodni hitrosti planeta in potuje po ravni črti v razdalji 1.5 radija planetnega tira. Fluktuacije zvezde v sredini in mimobežne zvezde bomo zanemarili.
+
+
+Zopet zapišemo Newtonov zakon za ta sistem:
+\begin{equation}
+m\ddot{\vec{r}} = -G\frac{mM}{r^{3}} \vec{r} - G \frac{mM}{|r-r_z| ^{3}} (\vec{r} - \vec{r_z}), 
+\end{equation}
+kjer je $\vec{r_z}$ razdalja mimobežne zvezde iz središča. Za lažje računanje ponovno uvedemo $M=m=G=\alpha=\omega=1$ in sistem prevedemo na sistem 4 enačb 1. reda:
+\begin{align*}
+\dot{x}&= u \\
+\dot{y}&=v \\
+\dot{u}&= - \frac{x}{(x^2 +y^2)^{2/3}} - \frac{x-x_z(t)}{\left( (x-x_z(t))^{2} + (y-y_z(t))^{2} \right)^{3/2}} \\
+\dot{v}&= - \frac{y}{(x^2 +y^2)^{2/3}} -\frac{y-y_z(t)}{\left( (x-x_z(t))^{2} + (y-y_z(t))^{2} \right)^{3/2}},
+\end{align*}
+kjer sta $x_z(t)= -x_0 +2v_0t$ in $y_z(t)= 1.5$. Z $x_0$ smo označili začetni položaj mimobežne zvezde. Skica problema je prikazana na sliki \ref{fig:slika7}.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.5\textwidth]{sistem_treh_teles.pdf}
+    \caption{Skica problema} \label{fig:slika7}
+\end{figure}
+
+\noindent Dobimo lahko tri različne rešitve
+\begin{itemize}
+\item planez se še vedno giblje okoli prvotne zvezde, toda z drugačno trajektorijo
+\item platen pobegne iz sistema in odleti v neskončnost
+\item planet prevzame mimobežna zvezda.
+\end{itemize}
+Rezultati so odvisno od hitrosti kroženja, hitrosti mimobežne zvezde in smer kroženja (pozitivna/negativna). Negativno smer smo definirali kot gibanje v nasprotni smeri urinega kazalca. Za pozitivno velja obratno.
+
+Najprej si poglejmo gibanje v nasprotni smeri urinega kazalca. Na voljo imamo le dve rešitvi, prikazani na slikah \ref{fig:slika8} in \ref{fig:slika9}. Rešitvni gledamo v sistemu mirujoče zvezde, ki leži v središču koordinatnega sistema. Gibanje planeta smo pričeli opazovati v točki (1,0) pri okoli 200 enotah razdalje mimobežne zvezde od središča. Poračunane količine so definirane:
+\begin{align*}
+T-V1 &= \frac{1}{2}(u^{2} +v^{2}) - 1/\sqrt{x^{2} +y^{2}} \\
+T-V2 &= \frac{1}{2}(u^{2} +v^{2}) - 1/\sqrt{(x-x_z(t))^{2} +(y-y_z(t))^{2}} \\
+T- V1 -V2 &=\frac{1}{2}(u^{2} +v^{2}) - 1/\sqrt{x^{2} +y^{2}} - 1/\sqrt{(x-x_z(t))^{2} +(y-y_z(t))^{2}}.
+\end{align*}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{tri_telesa_prva1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{tri_telesa_druga1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{tri_telesa_prva2.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{tri_telesa_druga2.pdf}
+    \end{subfigure}
+    \caption{Spremenjena oblika tira za različni hitrosti} \label{fig:slika8}
+\end{figure}
+\noindent Vidimo, da mimobežna zvezda spremeni tir in energijo sistema, planet pa ostane vezan na prvotni zvezdi. To se dogodi za začetne hitrosti do $v_0 \approx 1.1$. Pri hitrostih, ki so večje od te, planet odfrči v neskončnost. Za ta primer smo vzeli oddaljenost mimobežne zvezde mnogo manjšo od 200 enot.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{tri_telesa_prva3.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{tri_telesa_druga3.pdf}
+    \end{subfigure}
+    \caption{Planet odfrči v neskončnost.} \label{fig:slika9}
+\end{figure}
+
+Rezultati se malenkost spremenijo, če obrnemo začetno smer potovanja planeta. Tukaj dobimo tri različne rešitve. Če je hitrost dovolj majhna, dobimo po prehodu mimobežne zvezde spremenjen tir okoli prvotne zvezde. Rešitev je prikazana na sliki \ref{fig:slika10}
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{tri_telesa2_prva1.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{tri_telesa2_druga1.pdf}
+    \end{subfigure}
+    \caption{Spremenjena oblika tira.} \label{fig:slika10}
+\end{figure}
+\noindent Če malenkost povečamo začetno hitrost, mimobežna zvezda prevzame planet. Rešitev je prikazana na sliki \ref{fig:slika11}. Energija deluje kot da oscilira. Razlog tiči v tem, da smo v sistemu mirujoče zvezde v koordinatnem izhodišču in bi morali narediti galilejevo transformacijo. V em primeru bi morali dobiti konstanto energijo okoli mimobežne zvezde.
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{tri_telesa2_prva2.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{tri_telesa2_druga2.pdf}
+    \end{subfigure}
+    \caption{Mimobežna zvezda prevzame planet.} \label{fig:slika11}
+\end{figure}
+\noindent Preostane nam še primer, ko mimobežna zvezda povzroči, da planet odfrči v neskončnost. To se dogodi pri še večji začetni hitrosti. Rešitev je prikazana na sliki \ref{fig:slika12}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{tri_telesa2_prva3.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.45\textwidth}  			
+        \includegraphics[width=\textwidth]{tri_telesa2_druga3.pdf}
+    \end{subfigure}
+    \caption{planet odfrči v neskončnost.} \label{fig:slika12}
+\end{figure}
+
+\end{document}
