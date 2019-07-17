@@ -1,0 +1,438 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[utf8x]{inputenc}   % omogoča uporabo slovenskih črk kodiranih v formatu UTF-8
+\usepackage[slovene]{babel}    % naloži, med drugim, slovenske delilne vzorce
+
+\usepackage{subcaption}
+\usepackage[hyphens]{url}
+\usepackage{hyperref}
+
+
+\usepackage[pdftex]{graphicx}
+\usepackage{wrapfig}
+
+\usepackage{amsmath}
+%\renewcommand{\vec}[1]{\boldsymbol{#1}} %naredi vector kot bold zapis
+
+\usepackage{float}
+
+\usepackage{amssymb}
+
+%\documentclass[a4paper, 12pt]{article}
+%\usepackage[slovene]{babel}
+%\usepackage[latin2]{inputenc}
+%\usepackage[T1]{fontenc}
+%\usepackage{makeidx}%za stvarno kazalo
+%\makeindex%naredi stvarno kazalo
+%\usepackage{tikz}% paket za kroge
+
+\title{\textbf{Modelska analiza 2} \\ 12. naloga - Navier-Stokesov sistem \\}
+	\author{Študent: Pšeničnik Tomaž}
+	
+	
+
+
+	
+\begin{document}
+
+\pagenumbering{gobble}
+
+	\begin{figure} [h]
+  \centering
+  \includegraphics[width=12 cm]{logo_fmf.png}
+  \maketitle
+\end{figure}
+	
+	
+	
+	\newpage
+	\pagenumbering{arabic}
+	
+	
+
+\section*{Navier-Stokesov sistem}
+
+Eden od standardnih problemov za testiranje računskih shem za Navier-Stokesov sistem je vsiljeni tok v votlini (Driven Cavity). V neskončni posodi s presekom kvadrata vlečemo z neko hitrostjo pokrov posode in opazujemo, kako se spreminja hitrostni profil tekočine v posodi. Shemo poskusa prikazuje slika \ref{fig:slika1}, le da vlečemo levo stranico s konstantno hitrostjo.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.35\textwidth}  			
+        \includegraphics[width=\textwidth]{driven_cavity.pdf}
+    \end{subfigure}
+    \caption{Shema poskusa. ? $\rightarrow$ iščemo hitrostni profil tekočine v neskončni posodi.} \label{fig:slika1}
+\end{figure}
+
+Gibanje nestisljive tekočine v opisuje Navier-Stokesova enačba, pri kateri uvedemo brezdimenzijske količine $\vec{v}/v_0 = (u,v)$, $\vec{r}/a=(x,y)$, $p/\rho v_0 ^{2} \rightarrow p^{\prime}$ in Re=$a\rho v_0/\eta$, pri čemer nimamo zunanjih sil $\vec{f}=0$:
+\begin{equation} \label{eq:enacba1}
+\rho \left( \frac{\partial \vec{v}}{\partial t} + \left( \vec{v} \cdot \nabla) \vec{v} \right) \right) = \vec{f} - \nabla p + \eta \nabla ^{2} \vec{v} \rightarrow \frac{\partial \vec{v}}{\partial t} +\left(  \vec{v} \cdot \nabla) \vec{v} \right)= -\nabla p ^{\prime} + \frac{1}{\textrm{Re}} \nabla ^{2} \vec{v}.
+\end{equation}
+Pri pogoju, da je tekočina nestisljiva $\nabla \cdot \vec{v}=0$, lahko sistem (\ref{eq:enacba1}) rešujemo diektno. Elegantnejše reševanje je, če vpeljemo vrtinčnost
+\begin{equation} \label{eq:enacba2}
+\zeta = \nabla \times \vec{v}= \frac{\partial u}{partial y} - \frac{\partial v}{\partial x}
+\end{equation}
+in uporabimo rotor na enačbi (\ref{eq:enacba1}). Tako dobimo v 2D sistem treh enačb, kjer ni več členov s tlakom
+\begin{equation}\label{eq:eancba3}
+\frac{\partial \zeta}{\partial t}= - \frac{\partial u \zeta}{\partial x} - \frac{\partial v \zeta}{\partial y} + \frac{1}{\textrm{Re}}\left( \frac{\partial ^{2} \zeta}{\partial x^{2}} +\frac{\partial ^{2} \zeta}{\partial y^{2}} \right).
+\end{equation}
+Pri tem vse krajevne odvode zapišemo v centralni obliki
+\begin{align}\label{eq:enacba4}
+\frac{\partial f_{i,j}}{\partial x}=& \frac{ f_{i+1,j}-f_{i-1,j}}{2\Delta x} \nonumber \\
+\frac{\partial ^{2} f_{i,j}}{\partial y^{2}}=& \frac{f_{i,j+1} - 2f_{i,j} + f_{i,j-1}}{(\Delta x) ^{2}}.
+\end{align}
+Hitrostno polje dobimo iz tokovne funkcije
+\begin{equation*}
+\vec{v}=\nabla \times \psi,
+\end{equation*}
+tokovna funkcija pa je povezana z vrtinčnostjo s Poissonovo enačbo
+\begin{equation*}
+\nabla ^{2} \psi = \zeta.
+\end{equation*}
+Numeričen postopek si sledi po korakih:
+\begin{itemize}
+\item Nastavimo začetne pogoje
+\item Iz trenutne hitrosti $u$ in $v$ ter trenutne vrtinčnosti $\zeta_t$ določimo vrtinčnost ob novem času $\zeta_{t+\Delta t}$ preko diferenčne oblike enačbe (\ref{eq:eancba3})
+\item Iz doblene vrtinčnosti izračunamo hitrostni potencial $\psi$ preko Poissonove enačbe. Za reševanje te enačbe bomo uporabili SOR.
+\item Iz hitrstnega potenciala $\psi$ lahko določimo hitrosti $u$ in $v$.
+\item postopek ponavljamo do stacionarnega stanja
+\end{itemize}
+Pomembno je določiti časovni korak reševanja. Časovni korak smiselno omejimo z Courant–Friedrichs–Lewyjevim pogojem (CFL) $\Delta t < 0.4 \Delta x /v_max$, pri čemer je CFL=0.4.
+
+Sedaj imamo vse sestavine za izračun hitrostnega polja. Poglejmo si rezultate. Najprej si poglejmo hitrostno polje za Re=5, pri čemer smo razdelili mrežo na 40x40 točk in uporabili CFL=0.005 za izračun časovnega koraka. Časovno spreminjanje hitrostnega polja je prikazano na sliki \ref{fig:slika2}. Ko dosežemo stacionarno stanje se v dveh vogalih pojavita dva mala vrtinca. Pričakujemo, da bosta pri večjih Re številih vrtinca večja.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/velocity0.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/velocity76.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/velocity380.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/velocity1292.pdf}
+    \end{subfigure}
+ 
+     \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/velocity1596.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/velocity1900.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/velocity2508.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/velocity3064.pdf}
+    \end{subfigure}
+    \caption{Hitrostni profil za Re=5 pri $dt=0.00013$.} \label{fig:slika2}
+\end{figure}
+
+\noindent Poglejmo si še hitrosti $|\vec{v}|=\sqrt{u^{2} + v^{2}}$ hitrostnega polja. Rešitve so prikazane na sliki \ref{fig:slika3}. Preseneča, da so hitrosti znotraj preseka cevi večje od $v_0$.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/abs_v0.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/abs_v76.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/abs_v380.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/abs_v1292.pdf}
+    \end{subfigure}
+ 
+     \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/abs_v1596.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/abs_v1900.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/abs_v2508.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/abs_v3064.pdf}
+    \end{subfigure}
+    \caption{Hitrosti za Re=5 pri $dt=0.00013$.} \label{fig:slika3}
+\end{figure}
+
+\noindent Pogledamo si lahko še funkciji $\zeta$ in $\psi$ na slikah \ref{fig:slika4} in \ref{fig:slika5}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/zeta0.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/zeta76.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/zeta380.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/zeta1292.pdf}
+    \end{subfigure}
+ 
+     \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/zeta1596.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/zeta1900.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/zeta2508.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/zeta3064.pdf}
+    \end{subfigure}
+    \caption{$\zeta$ za Re=5 pri $dt=0.00013$.} \label{fig:slika4}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/psi0.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/psi76.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/psi380.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/psi1292.pdf}
+    \end{subfigure}
+ 
+     \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/psi1596.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/psi1900.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/psi2508.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re5/psi3064.pdf}
+    \end{subfigure}
+    \caption{$\psi$ za Re=5 pri $dt=0.00013$.} \label{fig:slika5}
+\end{figure}
+
+
+Nekoliko bolj zanimivo dogajanje je, če si pogledamo hitrostno polje  in ostale funkcije pri Re=10000. Računanje pri tako veliki številki je postalo že precej dolgotrajno. Hitrostno polje, hitrost, $\zeta$ in $\psi$ so prikazane na slikah \ref{fig:slika6} \ref{fig:slika7}, \ref{fig:slika8} in \ref{fig:slika9}. Opazimo da vrtinca nista več prisotna v desnih vogalih, temveč se preselita na spodnja dva vogala. Sredinski vrtinec, ki je bil pri Re=5 bliže stranici s konstantno hitrostjo, se je preselil v sredino.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/velocity0.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/velocity1950.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/velocity3900.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/velocity5850.pdf}
+    \end{subfigure}
+ 
+     \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/velocity7800.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/velocity33150.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/velocity56550.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/velocity77999.pdf}
+    \end{subfigure}
+    \caption{Hitrostni profil za Re=10000 pri $dt=0.00128$.} \label{fig:slika6}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/abs_v0.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/abs_v1950.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/abs_v3900.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/abs_v5850.pdf}
+    \end{subfigure}
+ 
+     \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/abs_v7800.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/abs_v33150.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/abs_v56550.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/abs_v77999.pdf}
+    \end{subfigure}
+    \caption{Hitrosti za Re=10000 pri $dt=0.00128$.} \label{fig:slika7}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/zeta0.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/zeta1950.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/zeta3900.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/zeta5850.pdf}
+    \end{subfigure}
+ 
+     \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/zeta7800.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/zeta33150.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/zeta56550.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/zeta77999.pdf}
+    \end{subfigure}
+    \caption{$\zeta$ za Re=10000 pri $dt=0.00128$.} \label{fig:slika8}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/psi0.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/psi1950.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/psi3900.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/psi5850.pdf}
+    \end{subfigure}
+ 
+     \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/psi7800.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/psi33150.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/psi56550.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re10000/psi77999.pdf}
+    \end{subfigure}
+    \caption{$\psi$ za Re=10000 pri $dt=0.00128$.} \label{fig:slika9}
+\end{figure}
+
+Poglejmo si še nekatera stacionarna stanja za vmesne Re.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re25/velocity1771.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re100/velocity4081.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re500/velocity8307.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re2000/velocity12661.pdf}
+    \end{subfigure}
+    \caption{Hitrostno polje za Re={25,100,500,2000} pri $dt=0.00128$.} \label{fig:slika10}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re25/abs_v1771.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re100/abs_v4081.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re500/abs_v8307.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re2000/abs_v12661.pdf}
+    \end{subfigure}
+    \caption{Hitrosti za Re={25,100,500,2000} pri $dt=0.00128$.} \label{fig:slika11}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re25/zeta1771.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re100/zeta4081.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re500/zeta8307.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re2000/zeta12661.pdf}
+    \end{subfigure}
+    \caption{$\zeta$ za Re={25,100,500,2000} pri $dt=0.00128$.} \label{fig:slika12}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re25/psi1771.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re100/psi4081.pdf}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re500/psi8307.pdf}
+    \end{subfigure}
+        \begin{subfigure}[b]{0.2\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike2/Re2000/psi12661.pdf}
+    \end{subfigure}
+    \caption{$\psi$ za Re={25,100,500,2000} pri $dt=0.00128$.} \label{fig:slika13}
+\end{figure}
+
+
+Za konec si poglejmo še silo na stranico, ki jo vlečemo s konstantno hitrostjo v odvisnosti od Re. Sila deluje v nasprotni smeri vlečenja in se izračuna po enačbi:
+\begin{equation}
+F=\frac{1}{Re} \int_0 ^{a} \zeta(x,y=0)dx = \frac{\Delta x}{\textrm{Re}}\left(  \frac{1}{2} \zeta_{0,0} + \sum _{i=1} ^{N-1} \zeta_{i,0} + \frac{1}{2}\zeta_{N,0}  \right).
+\end{equation}
+Rešitev je prikazana na sliki \ref{fig:slika14}.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}[b]{0.7\textwidth}  			
+        \includegraphics[width=\textwidth]{Slike/sila.pdf}
+    \end{subfigure}
+    \caption{Potrebna sila vlečenja, da je hitrost vlečene stranice konstanta. } \label{fig:slika14}
+\end{figure}
+
+\noindent Po pričakovanjih se z višanjem Re zmanjšuje sila na premikajočo se stranico, ker se z večanjem Re zmanjšuje viskoznost. Sile se tako eksponentno zmanjšujejo proti ničli. To je pričakovano, ker za zelo viskozne tekočine potrebujemo neskončno silo, da premaknemo tekočino, za zelo neviskozne tekočine pa že z zelo malo silo lahko premaknemo in zavrtimo tekočino.
+
+
+\end{document}
